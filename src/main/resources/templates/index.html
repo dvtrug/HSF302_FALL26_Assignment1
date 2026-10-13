@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{fragments/layout :: head('Trang chủ')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <div class="p-5 mb-4 bg-light rounded-3 shadow-sm text-center">
+        <div class="container-fluid py-4">
+            <h1 class="display-5 fw-bold text-primary">🎬 FU Cinema Ticket System</h1>
+            <p class="col-md-8 mx-auto fs-5 text-muted">
+                Chào mừng bạn đến với hệ thống đặt vé xem phim trực tuyến.
+            </p>
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <a th:href="@{/login}" class="btn btn-outline-primary px-4">Đăng nhập</a>
+                <a th:href="@{/register}" class="btn btn-warning px-4 text-dark fw-semibold">Đăng ký thành viên</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
