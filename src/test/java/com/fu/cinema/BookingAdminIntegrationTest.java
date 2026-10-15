@@ -29,6 +29,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -188,6 +189,26 @@ class BookingAdminIntegrationTest {
             bookings.findById(bookingId).orElseThrow().setStatus(status);
             entityManager.flush();
         });
+    }
+
+    @Test
+    void rendersVietnameseMovieTextAfterDatabaseRoundTrip() throws Exception {
+        String title = "Biệt Đội Siêu Tốc";
+        new TransactionTemplate(transactionManager).executeWithoutResult(tx -> {
+            var movie = bookings.findById(bookingId).orElseThrow().getShowtime().getMovie();
+            movie.setTitle(title);
+            movie.setDirector("Lê Minh");
+            movie.setDescription("Nội dung phim " + title + ".");
+            entityManager.flush();
+            entityManager.clear();
+        });
+        Booking detail = service.getDetail(bookingId);
+        assertThat(detail.getShowtime().getMovie().getTitle()).isEqualTo(title);
+        assertThat(detail.getShowtime().getMovie().getDirector()).isEqualTo("Lê Minh");
+        String html = mvc.perform(get("/admin/bookings/{id}", bookingId))
+                .andExpect(status().isOk()).andReturn().getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+        assertThat(html).contains(title);
     }
 
     @Test
