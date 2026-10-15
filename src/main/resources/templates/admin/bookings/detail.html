@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{fragments/layout :: head('Chi tiết đơn')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-4">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h3 th:text="|Đơn đặt vé #${booking.bookingId}|"></h3>
+
+    <table class="table">
+        <tbody>
+        <tr>
+            <th>Trạng thái</th>
+            <td th:text="${booking.status}"></td>
+        </tr>
+        <tr>
+            <th>Ngày đặt</th>
+            <td th:text="${#temporals.format(booking.bookingDate, 'dd/MM/yyyy HH:mm')}"></td>
+        </tr>
+        <tr>
+            <th>Khách hàng</th>
+            <td th:text="${booking.customer.fullName}"></td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td th:text="${booking.customer.email}"></td>
+        </tr>
+        <tr>
+            <th>Số điện thoại</th>
+            <td th:text="${booking.customer.mobile}"></td>
+        </tr>
+        <tr>
+            <th>Phim</th>
+            <td th:text="${booking.showtime.movie.title}"></td>
+        </tr>
+        <tr>
+            <th>Phòng</th>
+            <td th:text="${booking.showtime.room.roomName}"></td>
+        </tr>
+        <tr>
+            <th>Giờ chiếu</th>
+            <td th:text="${#temporals.format(booking.showtime.startTime, 'dd/MM/yyyy HH:mm')}"></td>
+        </tr>
+        <tr>
+            <th>Ghế</th>
+            <td>
+                <span class="badge bg-dark me-1"
+                      th:each="t : ${booking.tickets}"
+                      th:text="${t.seatCode}"></span>
+            </td>
+        </tr>
+        <tr>
+            <th>Tổng tiền</th>
+            <td th:text="|${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 0, 'POINT')} đ|"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a class="btn btn-secondary" th:href="@{/admin/bookings}">
+        Quay lại danh sách
+    </a>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
