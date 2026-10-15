@@ -34,13 +34,27 @@ public class DataSeeder implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         if (accountRepository.count() > 0) {
-            return;                                                          // chỉ seed khi DB rỗng
+            // Đảm bảo có sẵn tài khoản alias admin và locked_user để test nếu chưa có
+            if (!accountRepository.existsByUsername("admin")) {
+                accountRepository.save(new Account("admin", passwordEncoder.encode("Admin@123"),
+                        Role.ADMIN, AccountStatus.ACTIVE));
+            }
+            if (!accountRepository.existsByUsername("locked_user")) {
+                accountRepository.save(new Account("locked_user", passwordEncoder.encode("123456"),
+                        Role.CUSTOMER, AccountStatus.LOCKED));
+            }
+            return;                                                          // đã có data
         }
         log.info(">>> Seeding sample data...");
 
         // ---- Accounts & Customers ----
         accountRepository.save(new Account("admin@fucinema.vn", passwordEncoder.encode("Admin@123"),
                 Role.ADMIN, AccountStatus.ACTIVE));
+        accountRepository.save(new Account("admin", passwordEncoder.encode("Admin@123"),
+                Role.ADMIN, AccountStatus.ACTIVE));
+        accountRepository.save(new Account("locked_user", passwordEncoder.encode("123456"),
+                Role.CUSTOMER, AccountStatus.LOCKED));
+
         Customer an = customer("Nguyen Van An", "an.nv@gmail.com", "0901234567", LocalDate.of(2000, 5, 12), "079200001234");
         Customer binh = customer("Tran Thi Binh", "binh.tt@gmail.com", "0912345678", LocalDate.now().minusYears(15), "079209005678");
 
