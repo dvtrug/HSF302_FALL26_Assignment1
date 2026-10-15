@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{fragments/layout :: head('Đăng ký tài khoản')}"></head>
+<body class="bg-dark text-light min-vh-100 d-flex flex-column">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container my-auto py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card bg-secondary bg-opacity-25 border-secondary text-light shadow-lg rounded-4 p-4">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <span class="fs-1">🎟️</span>
+                        <h2 class="fw-bold text-warning mt-2">Đăng Ký Tài Khoản</h2>
+                        <p class="text-secondary small">Trở thành thành viên của FU Cinema để nhận ưu đãi và đặt vé tiện lợi</p>
+                    </div>
+
+                    <form th:action="@{/register}" th:object="${registerForm}" method="post">
+                        <div class="row g-3">
+                            <!-- Họ và tên -->
+                            <div class="col-md-6">
+                                <label for="fullName" class="form-label fw-semibold">Họ và tên <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       id="fullName"
+                                       th:field="*{fullName}"
+                                       class="form-control bg-dark text-light border-secondary"
+                                       th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
+                                       placeholder="Nguyễn Văn A"
+                                       required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                            </div>
+
+                            <!-- Tên đăng nhập -->
+                            <div class="col-md-6">
+                                <label for="username" class="form-label fw-semibold">Tên đăng nhập <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       id="username"
+                                       th:field="*{username}"
+                                       class="form-control bg-dark text-light border-secondary"
+                                       th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''"
+                                       placeholder="username123"
+                                       required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                            </div>
+
+                            <!-- Mật khẩu -->
+                            <div class="col-md-6">
+                                <label for="password" class="form-label fw-semibold">Mật khẩu <span class="text-danger">*</span></label>
+                                <input type="password"
+                                       id="password"
+                                       th:field="*{password}"
+                                       class="form-control bg-dark text-light border-secondary"
+                                       th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
+                                       placeholder="≥ 8 ký tự, có hoa, thường, số"
+                                       required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                            </div>
+
+                            <!-- Xác nhận mật khẩu -->
+                            <div class="col-md-6">
+                                <label for="confirmPassword" class="form-label fw-semibold">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                                <input type="password"
+                                       id="confirmPassword"
+                                       th:field="*{confirmPassword}"
+                                       class="form-control bg-dark text-light border-secondary"
+                                       th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''"
+                                       placeholder="Nhập lại mật khẩu"
+                                       required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label for="email" class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                                <input type="email"
+                                       id="email"
+                                       th:field="*{email}"
+                                       class="form-control bg-dark text-light border-secondary"
+                                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                                       placeholder="email@example.com"
+                                       required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                            </div>
+
+                            <!-- Số điện thoại -->
+                            <div class="col-md-6">
+                                <label for="mobile" class="form-label fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="tel"
+                                       id="mobile"
+                                       th:field="*{mobile}"
+                                       class="form-control bg-dark text-light border-secondary"
+                                       th:classappend="${#fields.hasErrors('mobile')} ? 'is-invalid' : ''"
+                                       placeholder="0912345678"
+                                       required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('mobile')}" th:errors="*{mobile}"></div>
+                            </div>
+
+                            <!-- Số CCCD -->
+                            <div class="col-md-6">
+                                <label for="identityCard" class="form-label fw-semibold">Số CCCD / CMND <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       id="identityCard"
+                                       th:field="*{identityCard}"
+                                       class="form-control bg-dark text-light border-secondary"
+                                       th:classappend="${#fields.hasErrors('identityCard')} ? 'is-invalid' : ''"
+                                       placeholder="12 chữ số"
+                                       required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('identityCard')}" th:errors="*{identityCard}"></div>
+                            </div>
+
+                            <!-- Ngày sinh -->
+                            <div class="col-md-6">
+                                <label for="birthday" class="form-label fw-semibold">Ngày sinh <span class="text-danger">*</span></label>
+                                <input type="date"
+                                       id="birthday"
+                                       th:field="*{birthday}"
+                                       class="form-control bg-dark text-light border-secondary"
+                                       th:classappend="${#fields.hasErrors('birthday')} ? 'is-invalid' : ''"
+                                       required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}"></div>
+                                <div class="form-text text-secondary small">Yêu cầu từ đủ 13 tuổi trở lên.</div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100 fw-bold py-2 mt-4 mb-3 shadow-sm">
+                            Đăng ký ngay
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <span class="text-secondary">Đã có tài khoản? </span>
+                        <a th:href="@{/login}" class="text-warning text-decoration-none fw-semibold">Đăng nhập</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
