@@ -87,4 +87,12 @@ public class AdminCustomerController {
         return "redirect:/admin/customers";
     }
 
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id, RedirectAttributes ra) {
+        boolean deleted = customerService.delete(id);
+        ra.addFlashAttribute("success", deleted
+                ? "Đã xoá khách hàng"
+                : "Khách hàng đã có đơn đặt vé nên chỉ khoá tài khoản");
+        return "redirect:/admin/customers";
+    }
 }

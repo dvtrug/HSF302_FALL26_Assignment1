@@ -105,4 +105,48 @@ class AdminCustomerControllerTest {
                 .andExpect(redirectedUrl("/admin/customers"));
         org.assertj.core.api.Assertions.assertThat(auth.login("an.nv@gmail.com", "Customer@123")).isNotNull();
     }
+    @Test
+    @org.springframework.transaction.annotation.Transactional
+    void deleteLocksCustomerWithBookingsAndDeletesNewCustomer() throws Exception {
+        mvc.perform(post("/admin/customers/1/delete").session(admin))
+                .andExpect(redirectedUrl("/admin/customers"))
+                .andExpect(flash().attribute("success", "Khách hàng đã có đơn đặt vé nên chỉ khoá tài khoản"));
+        var customers = context.getBean(com.fu.cinema.repository.CustomerRepository.class);
+        var accounts = context.getBean(com.fu.cinema.repository.AccountRepository.class);
+        org.assertj.core.api.Assertions.assertThat(customers.findById(1L).orElseThrow().getAccount().getStatus())
+                .isEqualTo(com.fu.cinema.enums.AccountStatus.LOCKED);
+        mvc.perform(post("/admin/customers/new").session(admin)
+                        .param("fullName", "Delete Test").param("email", "delete.test@example.com")
+                        .param("mobile", "0987654321").param("birthday", "2000-05-12")
+                        .param("identityCard", "123456789012").param("password", "Customer@123")
+                        .param("status", "ACTIVE"))
+                .andExpect(redirectedUrl("/admin/customers"));
+        var account = accounts.findByUsername("delete.test@example.com").orElseThrow();
+        var customer = customers.findByAccount_AccountId(account.getAccountId()).orElseThrow();
+        mvc.perform(post("/admin/customers/{id}/delete", customer.getCustomerId()).session(admin))
+                .andExpect(redirectedUrl("/admin/customers"))
+                .andExpect(flash().attribute("success", "Đã xoá khách hàng"));
+        customers.flush();
+        org.assertj.core.api.Assertions.assertThat(customers.existsById(customer.getCustomerId())).isFalse();
+        org.assertj.core.api.Assertions.assertThat(accounts.existsById(account.getAccountId())).isFalse();
+    }
+
+    @Test
+    @org.springframework.transaction.annotation.Transactional
+    void renderedPaginationKeepsSearchKeyword() throws Exception {
+        var service = context.getBean(com.fu.cinema.service.CustomerService.class);
+        for (int i = 0; i < 11; i++) {
+            var f = new com.fu.cinema.dto.CustomerForm();
+            f.setFullName("Paging Test " + i);
+            f.setEmail("paging" + i + "@gmail.com");
+            f.setMobile(String.format("09900000%02d", i));
+            f.setIdentityCard(String.format("9990000000%02d", i));
+            f.setBirthday(java.time.LocalDate.of(2000, 1, 1));
+            f.setPassword("Customer@123");
+            service.create(f);
+        }
+        mvc.perform(get("/admin/customers").queryParam("kw", "GMAIL").session(admin))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("kw=GMAIL&amp;page=1")));
+    }
 }
