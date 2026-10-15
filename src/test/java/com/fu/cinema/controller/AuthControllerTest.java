@@ -6,6 +6,7 @@ import com.fu.cinema.dto.SessionUser;
 import com.fu.cinema.enums.Role;
 import com.fu.cinema.exception.BusinessException;
 import com.fu.cinema.service.AuthService;
+import com.fu.cinema.service.DashboardService;
 import com.fu.cinema.util.SessionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +30,9 @@ class AuthControllerTest {
     @Mock
     private AuthService authService;
 
+    @Mock
+    private DashboardService dashboardService;
+
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -38,7 +42,7 @@ class AuthControllerTest {
         viewResolver.setSuffix(".html");
 
         mockMvc = MockMvcBuilders
-                .standaloneSetup(new AuthController(authService), new AdminDashboardController())
+                .standaloneSetup(new AuthController(authService), new AdminDashboardController(dashboardService))
                 .addInterceptors(new AuthInterceptor())
                 .setViewResolvers(viewResolver)
                 .build();
