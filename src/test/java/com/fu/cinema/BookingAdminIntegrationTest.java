@@ -2,6 +2,8 @@ package com.fu.cinema;
 
 import com.fu.cinema.entity.Booking;
 import com.fu.cinema.entity.Ticket;
+import com.fu.cinema.dto.SessionUser;
+import com.fu.cinema.enums.Role;
 import com.fu.cinema.enums.BookingStatus;
 import com.fu.cinema.exception.BusinessException;
 import com.fu.cinema.exception.ResourceNotFoundException;
@@ -9,6 +11,7 @@ import com.fu.cinema.repository.BookingRepository;
 import com.fu.cinema.repository.CustomerRepository;
 import com.fu.cinema.repository.ShowtimeRepository;
 import com.fu.cinema.service.BookingService;
+import com.fu.cinema.util.SessionUtils;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Hibernate;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +21,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -48,7 +52,11 @@ class BookingAdminIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        mvc = MockMvcBuilders.webAppContextSetup(context).build();
+        MockHttpSession adminSession = new MockHttpSession();
+        adminSession.setAttribute(SessionUtils.CURRENT_USER,
+                SessionUser.builder().accountId(1L).displayName("Booking test admin").role(Role.ADMIN).build());
+        mvc = MockMvcBuilders.webAppContextSetup(context)
+                .defaultRequest(get("/").session(adminSession)).build();
         new TransactionTemplate(transactionManager).executeWithoutResult(tx -> {
             bookings.deleteAll();
             bookings.flush();
@@ -180,5 +188,36 @@ class BookingAdminIntegrationTest {
             bookings.findById(bookingId).orElseThrow().setStatus(status);
             entityManager.flush();
         });
+    }
+
+    @Test
+    void anonymousCannotReadOrChangeAdminBookings() throws Exception {
+        MockMvc anonymousMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        anonymousMvc.perform(get("/admin/bookings"))
+                .andExpect(redirectedUrl("/login?redirect=/admin/bookings"));
+        anonymousMvc.perform(get("/admin/bookings/{id}", bookingId))
+                .andExpect(redirectedUrl("/login?redirect=/admin/bookings/" + bookingId));
+        for (String action : List.of("confirm", "cancel")) {
+            anonymousMvc.perform(post("/admin/bookings/" + bookingId + "/" + action))
+                    .andExpect(status().is3xxRedirection());
+        }
+        assertThat(service.getDetail(bookingId).getStatus()).isEqualTo(BookingStatus.PENDING);
+    }
+
+    @Test
+    void customerCannotReadOrChangeAdminBookings() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute(SessionUtils.CURRENT_USER,
+                SessionUser.builder().accountId(2L).customerId(1L)
+                        .displayName("Booking test customer").role(Role.CUSTOMER).build());
+        MockMvc customerMvc = MockMvcBuilders.webAppContextSetup(context)
+                .defaultRequest(get("/").session(session)).build();
+        customerMvc.perform(get("/admin/bookings")).andExpect(redirectedUrl("/error/403"));
+        customerMvc.perform(get("/admin/bookings/{id}", bookingId)).andExpect(redirectedUrl("/error/403"));
+        for (String action : List.of("confirm", "cancel")) {
+            customerMvc.perform(post("/admin/bookings/" + bookingId + "/" + action))
+                    .andExpect(redirectedUrl("/error/403"));
+        }
+        assertThat(service.getDetail(bookingId).getStatus()).isEqualTo(BookingStatus.PENDING);
     }
 }
