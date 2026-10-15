@@ -52,4 +52,25 @@ public class CustomerProfileController {
         return "redirect:/customer/profile";
     }
 
+    @GetMapping("/password")
+    public String passwordForm(Model model) {
+        model.addAttribute("form", new ChangePasswordForm());
+        return "customer/password";
+    }
+
+    @PostMapping("/password")
+    public String changePassword(@Valid @ModelAttribute("form") ChangePasswordForm form, BindingResult br,
+                                 HttpSession session, Model model, RedirectAttributes ra) {
+        if (br.hasErrors()) {
+            return "customer/password";
+        }
+        try {
+            customerService.changePassword(SessionUtils.getCurrentUser(session).getAccountId(), form);
+        } catch (BusinessException e) {
+            model.addAttribute("error", e.getMessage());
+            return "customer/password";
+        }
+        ra.addFlashAttribute("success", "Đã đổi mật khẩu");
+        return "redirect:/customer/profile";
+    }
 }

@@ -115,4 +115,65 @@ class CustomerProfileControllerTest {
                 SessionUser.builder().accountId(1L).role(Role.ADMIN).build());
         mvc.perform(get("/customer/profile").session(admin)).andExpect(redirectedUrl("/error/403"));
     }
+    private MockHttpServletRequestBuilder passwordRequest(String current, String next, String confirm) {
+        return post("/customer/password").session(session)
+                .param("currentPassword", current).param("newPassword", next).param("confirmPassword", confirm);
+    }
+
+    @Test
+    void rendersPasswordFormAndProtectsPasswordRoutes() throws Exception {
+        mvc.perform(get("/customer/password").session(session))
+                .andExpect(status().isOk()).andExpect(view().name("customer/password"))
+                .andExpect(model().attributeExists("form"));
+        mvc.perform(get("/customer/password"))
+                .andExpect(redirectedUrl("/login?redirect=/customer/password"));
+        mvc.perform(post("/customer/password"))
+                .andExpect(redirectedUrl("/login?redirect=/customer/password"));
+    }
+
+    @Test
+    void changesOnlyCurrentAccountsPasswordAndAllowsLoginWithNewPassword() throws Exception {
+        var accounts = context.getBean(com.fu.cinema.repository.AccountRepository.class);
+        var encoder = context.getBean(org.springframework.security.crypto.password.PasswordEncoder.class);
+        var other = auth.login("binh.tt@gmail.com", "Customer@123");
+        String otherHash = accounts.findById(other.getAccountId()).orElseThrow().getPassword();
+        mvc.perform(passwordRequest("Customer@123", "NewPassword123", "NewPassword123")
+                        .param("accountId", other.getAccountId().toString()))
+                .andExpect(redirectedUrl("/customer/profile"))
+                .andExpect(flash().attribute("success", "Đã đổi mật khẩu"));
+        String hash = accounts.findById(user.getAccountId()).orElseThrow().getPassword();
+        assertThat(hash).isNotEqualTo("NewPassword123");
+        assertThat(encoder.matches("NewPassword123", hash)).isTrue();
+        assertThat(encoder.matches("Customer@123", hash)).isFalse();
+        assertThat(auth.login(user.getUsername(), "NewPassword123")).isNotNull();
+        assertThat(accounts.findById(other.getAccountId()).orElseThrow().getPassword()).isEqualTo(otherHash);
+    }
+
+    @Test
+    void rejectsIncorrectCurrentPasswordWithoutChangingStoredHash() throws Exception {
+        var accounts = context.getBean(com.fu.cinema.repository.AccountRepository.class);
+        String before = accounts.findById(user.getAccountId()).orElseThrow().getPassword();
+        mvc.perform(passwordRequest("WrongPassword123", "NewPassword123", "NewPassword123"))
+                .andExpect(status().isOk()).andExpect(view().name("customer/password"))
+                .andExpect(model().attribute("error", "Mật khẩu hiện tại không đúng"));
+        assertThat(accounts.findById(user.getAccountId()).orElseThrow().getPassword()).isEqualTo(before);
+    }
+
+    @Test
+    void rejectsMismatchingConfirmation() throws Exception {
+        mvc.perform(passwordRequest("Customer@123", "NewPassword123", "DifferentPassword123"))
+                .andExpect(status().isOk()).andExpect(view().name("customer/password"))
+                .andExpect(model().attribute("error", "Mật khẩu nhập lại không khớp"));
+        assertThat(auth.login(user.getUsername(), "Customer@123")).isNotNull();
+    }
+
+    @Test
+    void rejectsMissingFieldsAndWeakNewPassword() throws Exception {
+        mvc.perform(passwordRequest("", "", ""))
+                .andExpect(status().isOk()).andExpect(model().attributeHasFieldErrors("form",
+                        "currentPassword", "newPassword", "confirmPassword"));
+        mvc.perform(passwordRequest("Customer@123", "weak", "weak"))
+                .andExpect(status().isOk()).andExpect(model().attributeHasFieldErrors("form", "newPassword"));
+        assertThat(auth.login(user.getUsername(), "Customer@123")).isNotNull();
+    }
 }
