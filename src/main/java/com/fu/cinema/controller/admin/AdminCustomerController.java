@@ -31,4 +31,53 @@ public class AdminCustomerController {
         return "admin/customers/list";
     }
 
+    @GetMapping("/new")
+    public String createForm(Model model) {
+        model.addAttribute("form", new CustomerForm());
+        model.addAttribute("statuses", AccountStatus.values());
+        return FORM_VIEW;
+    }
+
+    @PostMapping("/new")
+    public String create(@Valid @ModelAttribute("form") CustomerForm form, BindingResult br,
+                         Model model, RedirectAttributes ra) {
+        model.addAttribute("statuses", AccountStatus.values());
+        if (br.hasErrors()) {
+            return FORM_VIEW;
+        }
+        try {
+            customerService.create(form);
+        } catch (BusinessException e) {
+            model.addAttribute("error", e.getMessage());
+            return FORM_VIEW;
+        }
+        ra.addFlashAttribute("success", "Đã thêm khách hàng " + form.getFullName());
+        return "redirect:/admin/customers";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model) {
+        model.addAttribute("form", customerService.getForm(id));
+        model.addAttribute("statuses", AccountStatus.values());
+        return FORM_VIEW;
+    }
+
+    @PostMapping("/{id}/edit")
+    public String update(@PathVariable Long id, @Valid @ModelAttribute("form") CustomerForm form, BindingResult br,
+                         Model model, RedirectAttributes ra) {
+        form.setCustomerId(id);
+        model.addAttribute("statuses", AccountStatus.values());
+        if (br.hasErrors()) {
+            return FORM_VIEW;
+        }
+        try {
+            customerService.update(id, form);
+        } catch (BusinessException e) {
+            model.addAttribute("error", e.getMessage());
+            return FORM_VIEW;
+        }
+        ra.addFlashAttribute("success", "Đã cập nhật khách hàng " + form.getFullName());
+        return "redirect:/admin/customers";
+    }
+
 }
