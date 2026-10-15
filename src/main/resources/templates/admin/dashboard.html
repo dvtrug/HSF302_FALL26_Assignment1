@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{fragments/layout :: head('Bảng điều khiển Quản trị')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container py-4">
+    <div class="p-5 mb-4 bg-dark text-light rounded-3 shadow border border-secondary">
+        <div class="container-fluid py-3">
+            <h1 class="display-5 fw-bold text-warning">🎬 Bảng điều khiển Quản trị</h1>
+            <p class="col-md-8 fs-5 text-secondary">Chào mừng bạn đến với khu vực quản trị rạp chiếu phim FU Cinema.</p>
+            <div class="d-flex gap-2 mt-4">
+                <a class="btn btn-warning px-4" th:href="@{/admin/movies}">Quản lý Phim</a>
+                <a class="btn btn-outline-light px-4" th:href="@{/admin/showtimes}">Lịch chiếu</a>
+                <a class="btn btn-outline-info px-4" th:href="@{/admin/bookings}">Đơn đặt vé</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
