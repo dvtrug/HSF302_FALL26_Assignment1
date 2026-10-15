@@ -80,4 +80,11 @@ public class AdminCustomerController {
         return "redirect:/admin/customers";
     }
 
+    @PostMapping("/{id}/lock")
+    public String toggleLock(@PathVariable Long id, RedirectAttributes ra) {
+        customerService.toggleLock(id);
+        ra.addFlashAttribute("success", "Đã cập nhật trạng thái tài khoản");
+        return "redirect:/admin/customers";
+    }
+
 }

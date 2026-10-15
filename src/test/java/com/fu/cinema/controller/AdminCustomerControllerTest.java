@@ -92,4 +92,17 @@ class AdminCustomerControllerTest {
                 .andExpect(model().attribute("error", "Số điện thoại đã được sử dụng"))
                 .andExpect(content().string(containsString("Duplicate Customer")));
     }
+    @Test
+    @org.springframework.transaction.annotation.Transactional
+    void locksAndUnlocksThroughPostAndControlsLogin() throws Exception {
+        mvc.perform(post("/admin/customers/1/lock").session(admin))
+                .andExpect(redirectedUrl("/admin/customers"))
+                .andExpect(flash().attributeExists("success"));
+        var auth = context.getBean(com.fu.cinema.service.AuthService.class);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> auth.login("an.nv@gmail.com", "Customer@123"))
+                .isInstanceOf(com.fu.cinema.exception.BusinessException.class);
+        mvc.perform(post("/admin/customers/1/lock").session(admin))
+                .andExpect(redirectedUrl("/admin/customers"));
+        org.assertj.core.api.Assertions.assertThat(auth.login("an.nv@gmail.com", "Customer@123")).isNotNull();
+    }
 }
