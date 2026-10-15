@@ -1,0 +1,17 @@
+# Người sở hữu mặc định
+*                                                   @leader-A
+
+# Theo module (thay bằng username GitHub thật)
+/src/main/java/com/fu/cinema/entity/                @leader-A
+/pom.xml                                            @leader-A
+/src/main/resources/application.properties          @leader-A
+**/*Customer*                                       @member-B
+**/*Profile*                                        @member-B
+**/*Genre*                                          @member-C
+**/*Movie*                                          @member-C
+**/*Review*                                         @member-C
+**/*Room*                                           @member-D
+**/*Showtime*                                       @member-D
+**/*Booking*                                        @member-E
+**/*Ticket*                                         @member-E
+**/*Report*                                         @member-E
