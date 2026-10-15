@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
 
@@ -20,9 +21,11 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long movieId;
 
+    @Nationalized
     @Column(nullable = false, length = 200)
     private String title;
 
+    @Nationalized
     @Column(nullable = false, length = 100)
     private String director;
 
@@ -36,6 +39,7 @@ public class Movie {
     @Column(nullable = false, length = 10)
     private AgeRating ageRating;
 
+    @Nationalized
     @Column(nullable = false, length = 2000)
     private String description;
 
