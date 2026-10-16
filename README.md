@@ -196,5 +196,6 @@ Nhóm áp dụng nghiêm ngặt quy trình làm việc chuyên nghiệp:
 
 * **Học phần:** HSF302 — Java Web Application Development with Spring Framework.
 * **Học kỳ:** Fall 2026 — FPT University.
+* **Báo cáo hoàn chỉnh (Word):** [docs/Assignment1_Report_Group6.docx](docs/Assignment1_Report_Group6.docx)
 * **Trưởng nhóm:** Đỗ Võ Thanh Trung (`thanhtrungxxz@gmail.com`).
 * **GitHub Project:** [https://github.com/dvtrug/HSF302_FALL26_Assignment1](https://github.com/dvtrug/HSF302_FALL26_Assignment1)
