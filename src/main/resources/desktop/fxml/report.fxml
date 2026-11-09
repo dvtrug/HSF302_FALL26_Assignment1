@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" styleClass="page">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fu.cinema.desktop.controller.ReportController" styleClass="page">
     <Label text="Báo cáo doanh thu bán vé" styleClass="page-title"/>
     <HBox fx:id="filters" spacing="8" alignment="CENTER_LEFT">
         <Label text="Từ ngày"/>
