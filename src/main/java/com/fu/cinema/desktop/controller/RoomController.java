@@ -23,6 +23,20 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * Controller cho Tab Quản lý phòng chiếu (TODO 41a - FXML: {@code room-tab.fxml}).
+ * <p>
+ * Tính năng chính:
+ * <ul>
+ *   <li>Hiển thị danh sách phòng chiếu trên {@link TableView} với cột sức chứa tự động tính toán</li>
+ *   <li>Form thêm mới / cập nhật phòng chiếu với bộ chọn {@link RoomType} và {@link RoomStatus}</li>
+ *   <li>Spinners giới hạn hàng ghế (1..26) và số ghế mỗi hàng (1..30)</li>
+ *   <li>Tự động tính và bind nhãn sức chứa tạm tính khi thay đổi giá trị spinner</li>
+ *   <li>Kiểm tra tính hợp lệ dữ liệu 2 lớp: UI validation + Bean Validation ({@link FxValidator})</li>
+ *   <li>Xử lý xoá phòng chiếu theo quy định an toàn BR-06 kết hợp hộp thoại xác nhận</li>
+ * </ul>
+ * </p>
+ */
 @Component
 @Scope("prototype")
 @RequiredArgsConstructor
@@ -61,6 +75,9 @@ public class RoomController {
     private final ObservableList<RoomRow> rows = FXCollections.observableArrayList();
     private Long editingId;
 
+    /**
+     * Khởi tạo giao diện, thiết lập cell factory, listener và tải dữ liệu phòng ban đầu.
+     */
     @FXML
     private void initialize() {
         // Cấu hình các cột TableView theo chuẩn lambda record (TECH-14)
@@ -129,6 +146,11 @@ public class RoomController {
         reload();
     }
 
+    /**
+     * Điền thông tin phòng được chọn trên TableView vào các trường nhập liệu của form.
+     *
+     * @param row bản ghi phòng chiếu được chọn
+     */
     private void fill(RoomRow row) {
         if (row == null) {
             onNew();
@@ -143,6 +165,9 @@ public class RoomController {
         cbStatus.setValue(row.status());
     }
 
+    /**
+     * Đặt lại form về trạng thái thêm mới ban đầu.
+     */
     @FXML
     public void onNew() {
         editingId = null;
@@ -155,6 +180,9 @@ public class RoomController {
         tableRooms.getSelectionModel().clearSelection();
     }
 
+    /**
+     * Tải lại danh sách phòng chiếu từ cơ sở dữ liệu trên Virtual Thread.
+     */
     @FXML
     public void reload() {
         fxAsync.run(facade::findAll, list -> {
@@ -163,6 +191,9 @@ public class RoomController {
         }, btnRefresh);
     }
 
+    /**
+     * Lưu thông tin phòng chiếu (thêm mới hoặc cập nhật).
+     */
     @FXML
     public void onSave() {
         commitSpinners();
@@ -197,6 +228,9 @@ public class RoomController {
         );
     }
 
+    /**
+     * Xoá phòng chiếu với cơ chế an toàn theo quy định BR-06.
+     */
     @FXML
     public void onDelete() {
         RoomRow selected = tableRooms.getSelectionModel().getSelectedItem();
@@ -221,6 +255,9 @@ public class RoomController {
         );
     }
 
+    /**
+     * Đồng bộ giá trị số gõ tay trong editor của Spinner vào ValueFactory khi mất focus.
+     */
     private void commitSpinners() {
         try {
             if (spRows.getEditor().getText() != null && !spRows.getEditor().getText().isBlank()) {
