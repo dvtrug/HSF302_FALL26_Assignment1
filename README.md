@@ -223,7 +223,8 @@ yêu cầu quyền ADMIN. Để thử desktop với dữ liệu mẫu trên H2 t
 
 Chạy `.\mvnw.cmd -B -ntp clean verify` để kiểm thử và đóng gói. Trên Linux
 thiếu màn hình X, chạy `xvfb-run -a ./mvnw -B -ntp clean verify` để kiểm tra cả
-các test JavaFX cần hiển thị.
+các test JavaFX cần hiển thị. Báo cáo JaCoCo của tầng service và desktop
+facade được tạo tại `target/site/jacoco/index.html`.
 
 - [Bảng phân công và nhánh theo issue](docs/Assignment2_Board.md)
 - [Phân công 5 thành viên](docs/desktop-contributions.md)
