@@ -5,6 +5,8 @@ import com.fu.cinema.desktop.model.CounterMovieItem;
 import com.fu.cinema.desktop.model.ShowtimeItem;
 import com.fu.cinema.desktop.model.SaleResult;
 import com.fu.cinema.desktop.session.DesktopSession;
+import com.fu.cinema.dto.BookingRequest;
+import com.fu.cinema.entity.Ticket;
 import com.fu.cinema.service.CustomerService;
 import com.fu.cinema.service.MovieService;
 import com.fu.cinema.service.ShowtimeService;
@@ -38,5 +40,18 @@ public class CounterSaleFacade {
     public List<ShowtimeItem> showtimes(Long movieId) {
         return showtimes.findUpcomingByMovie(movieId).stream().map(s -> new ShowtimeItem(s.getShowtimeId(),
                 s.getStartTime(), s.getRoom().getRoomName(), s.getTicketPrice())).toList();
+    }
+
+    /** Create tickets and optionally confirm them atomically (BR-10/11/12, BR-D2). */
+    @Transactional
+    public SaleResult sell(Long customerId, Long showtimeId, List<String> seats, boolean paid) {
+        session.requireAdmin();
+        BookingRequest request = new BookingRequest();
+        request.setShowtimeId(showtimeId);
+        request.setSeatCodes(new java.util.ArrayList<>(seats));
+        var booking = bookings.create(customerId, request);
+        if (paid) bookings.confirm(booking.getBookingId());
+        return new SaleResult(booking.getBookingId(), booking.getTickets().stream().map(Ticket::getSeatCode).sorted().toList(),
+                booking.getTotalAmount(), booking.getStatus());
     }
 }
