@@ -18,7 +18,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
+/**
+ * Facade chịu trách nhiệm cung cấp nghiệp vụ tìm kiếm, phân trang và nạp dữ liệu phim cho Desktop.
+ * Ánh xạ Entity {@link com.fu.cinema.entity.Movie} sang {@link MovieRow} trong transaction an toàn.
+ */
 @Component
 @Scope("prototype")
 @RequiredArgsConstructor
