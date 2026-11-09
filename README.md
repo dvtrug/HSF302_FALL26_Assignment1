@@ -229,3 +229,21 @@ các test JavaFX cần hiển thị.
 - [Phân công 5 thành viên](docs/desktop-contributions.md)
 - [Ma trận nghiệm thu TC-D01–TC-D20](docs/desktop-acceptance.md)
 - [Các bước chuẩn bị và phát hành v2.0.0](docs/desktop-release.md)
+
+### Ảnh chạy thử với dữ liệu mẫu H2
+
+| Đăng nhập | Khung quản trị |
+| --- | --- |
+| <img src="docs/screenshots/desktop/01-dang-nhap.png" alt="Màn hình đăng nhập desktop" width="440"> | <img src="docs/screenshots/desktop/02-khung-quan-tri.png" alt="Khung điều hướng sau khi đăng nhập" width="440"> |
+
+| Xem trước sơ đồ ghế | Cảnh báo giới hạn |
+| --- | --- |
+| <img src="docs/screenshots/desktop/03-so-do-ghe.png" alt="Sơ đồ phòng 8 hàng và 12 ghế mỗi hàng" width="440"> | <img src="docs/screenshots/desktop/04-gioi-han-8-ghe.png" alt="Cảnh báo khi chọn ghế thứ chín" width="360"> |
+
+| Báo cáo có dữ liệu | Báo cáo kỳ rỗng |
+| --- | --- |
+| <img src="docs/screenshots/desktop/05-bao-cao-doanh-thu.png" alt="Báo cáo doanh thu có biểu đồ và đơn xác nhận" width="440"> | <img src="docs/screenshots/desktop/06-bao-cao-ky-rong.png" alt="Báo cáo kỳ rỗng và nút xuất bị khóa" width="440"> |
+
+Ảnh khung quản trị và sơ đồ ghế chụp trên bản chạy thử trước tích hợp.
+Sơ đồ ghế được nhúng vào khung để kiểm tra component của #54. Luồng bán vé
+tại quầy được nghiệm thu riêng sau khi có #55.
