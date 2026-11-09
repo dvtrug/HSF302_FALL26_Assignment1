@@ -115,6 +115,23 @@ class CounterSaleControllerTest {
         awaitFx(map::isVisible);
 
         onFx(() -> {
+            seat(map, "A8").fire();
+            movies.setValue(null);
+            assertNull(showtimes.getValue());
+            assertTrue(showtimes.getItems().isEmpty());
+            assertTrue(map.getSelectedSeats().isEmpty(), "Changing movie must clear the previous seat selection");
+            assertTrue(map.lookupAll(".seat").isEmpty(), "Old room seats must be discarded immediately");
+            assertTrue(sell.isDisabled());
+            assertTrue(((Label) view.getNamespace().get("total")).getText().startsWith("0 ghế"));
+            movies.setValue(movies.getItems().stream().filter(item -> item.title().equals("Biệt Đội Siêu Tốc"))
+                    .findFirst().orElseThrow());
+            return null;
+        });
+        awaitFx(() -> !showtimes.getItems().isEmpty());
+        onFx(() -> { showtimes.getSelectionModel().selectFirst(); return null; });
+        awaitFx(map::isVisible);
+
+        onFx(() -> {
             seat(map, "A1").fire();
             var total = (Label) view.getNamespace().get("total");
             assertTrue(total.getText().contains("1 ghế"));

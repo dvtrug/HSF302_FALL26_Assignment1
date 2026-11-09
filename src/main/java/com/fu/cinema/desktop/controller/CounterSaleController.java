@@ -6,6 +6,7 @@ import com.fu.cinema.desktop.facade.SeatMapFacade;
 import com.fu.cinema.desktop.model.CounterMovieItem;
 import com.fu.cinema.desktop.model.CustomerItem;
 import com.fu.cinema.desktop.model.ShowtimeItem;
+import com.fu.cinema.desktop.model.SeatMapData;
 import com.fu.cinema.desktop.util.AlertUtil;
 import com.fu.cinema.desktop.util.FxAsync;
 import com.fu.cinema.desktop.util.MoneyUtil;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
@@ -149,6 +151,7 @@ public class CounterSaleController {
     private void loadSeats(ShowtimeItem selected) {
         long request = ++seatRequest;
         seatsReady.set(false);
+        seatMap.setData(new SeatMapData(List.of(), 0, Set.of()));
         seatHint.setText(selected == null ? "Chọn suất chiếu để hiển thị sơ đồ ghế." : "Đang tải sơ đồ ghế…");
         if (selected == null) {
             return;
