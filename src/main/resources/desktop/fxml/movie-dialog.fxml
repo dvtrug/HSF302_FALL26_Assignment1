@@ -11,6 +11,10 @@
         <Insets top="16" right="20" bottom="16" left="20"/>
     </padding>
 
+    <!-- Thông báo lỗi khi validate không đạt -->
+    <Label fx:id="lblError" text="" style="-fx-text-fill: #d32f2f; -fx-font-weight: bold; -fx-padding: 4 8; -fx-background-color: #fee2e2; -fx-background-radius: 4;"
+           wrapText="true" visible="false" managed="false"/>
+
     <GridPane hgap="12" vgap="12">
         <columnConstraints>
             <ColumnConstraints minWidth="120" prefWidth="130"/>

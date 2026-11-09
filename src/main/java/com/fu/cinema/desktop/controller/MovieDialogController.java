@@ -28,6 +28,7 @@ public class MovieDialogController {
     private final MovieFacade movieFacade;
     private final FxValidator fxValidator;
 
+    @FXML private Label lblError;
     @FXML private TextField tfTitle;
     @FXML private ComboBox<GenreItem> cbGenre;
     @FXML private TextField tfDirector;
@@ -59,11 +60,18 @@ public class MovieDialogController {
     }
 
     public void setForm(MovieForm form) {
+        if (lblError != null) {
+            lblError.setText("");
+            lblError.setVisible(false);
+            lblError.setManaged(false);
+        }
+
         if (form == null) {
             currentMovieId = null;
             tfTitle.clear();
             tfDirector.clear();
             spDuration.getValueFactory().setValue(120);
+            spDuration.getEditor().setText("120");
             dpReleaseDate.setValue(null);
             cbAgeRating.setValue(AgeRating.P);
             cbStatus.setValue(MovieStatus.SHOWING);
@@ -77,6 +85,7 @@ public class MovieDialogController {
         tfDirector.setText(form.getDirector());
         if (form.getDuration() != null) {
             spDuration.getValueFactory().setValue(form.getDuration());
+            spDuration.getEditor().setText(String.valueOf(form.getDuration()));
         }
         dpReleaseDate.setValue(form.getReleaseDate());
         cbAgeRating.setValue(form.getAgeRating());
@@ -98,7 +107,20 @@ public class MovieDialogController {
         form.setMovieId(currentMovieId);
         form.setTitle(tfTitle.getText() != null ? tfTitle.getText().trim() : "");
         form.setDirector(tfDirector.getText() != null ? tfDirector.getText().trim() : "");
-        form.setDuration(spDuration.getValue());
+
+        Integer duration = null;
+        try {
+            String text = spDuration.getEditor() != null ? spDuration.getEditor().getText() : null;
+            if (text != null && !text.isBlank()) {
+                duration = Integer.parseInt(text.trim());
+            } else if (spDuration.getValue() != null) {
+                duration = spDuration.getValue();
+            }
+        } catch (NumberFormatException e) {
+            duration = -1; // Kích hoạt @Min(30)
+        }
+        form.setDuration(duration);
+
         form.setReleaseDate(dpReleaseDate.getValue());
         form.setAgeRating(cbAgeRating.getValue());
         form.setStatus(cbStatus.getValue());
@@ -122,6 +144,17 @@ public class MovieDialogController {
                 "posterUrl", tfPosterUrl,
                 "description", taDescription
         );
-        return fxValidator.mark(errors, fields);
+        boolean valid = fxValidator.mark(errors, fields);
+        if (!valid && lblError != null) {
+            String firstError = errors.values().iterator().next();
+            lblError.setText("⚠ " + firstError);
+            lblError.setVisible(true);
+            lblError.setManaged(true);
+        } else if (lblError != null) {
+            lblError.setText("");
+            lblError.setVisible(false);
+            lblError.setManaged(false);
+        }
+        return valid;
     }
 }

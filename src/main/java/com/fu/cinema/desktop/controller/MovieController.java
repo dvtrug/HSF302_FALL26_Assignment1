@@ -157,6 +157,10 @@ public class MovieController {
         dialog.getDialogPane().setContent(loaded.root());
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
+        // Áp dụng stylesheet desktop.css cho Dialog để hiển thị viền đỏ :error và thông báo
+        String css = java.util.Objects.requireNonNull(getClass().getResource("/desktop/css/desktop.css")).toExternalForm();
+        dialog.getDialogPane().getStylesheets().add(css);
+
         // Chặn đóng Dialog nếu validate lỗi (TC-D09)
         Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
         okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
