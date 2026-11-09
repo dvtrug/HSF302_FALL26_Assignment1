@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="root" spacing="20" styleClass="page" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.fu.cinema.desktop.controller.DashboardController">
+
+    <!-- Header bar -->
+    <HBox alignment="CENTER_LEFT" spacing="16">
+        <VBox spacing="4">
+            <Label text="Tổng quan hệ thống" styleClass="page-title"/>
+            <Label fx:id="lblUpdated" text="Chưa cập nhật" styleClass="text-muted"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnRefresh" text="Làm mới" onAction="#refresh" styleClass="button, primary"/>
+    </HBox>
+
+    <!-- 3 KPI Metric Cards -->
+    <HBox spacing="16" styleClass="kpi-container">
+        <!-- KPI 1: Phim đang chiếu -->
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="Phim đang chiếu" styleClass="kpi-title"/>
+            <Label fx:id="lblShowing" text="0" styleClass="kpi-value, kpi-showing"/>
+            <Label text="Đang mở bán vé" styleClass="kpi-subtext"/>
+        </VBox>
+
+        <!-- KPI 2: Khách hàng -->
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="Tổng khách hàng" styleClass="kpi-title"/>
+            <Label fx:id="lblCustomers" text="0" styleClass="kpi-value, kpi-customers"/>
+            <Label text="Tài khoản trên hệ thống" styleClass="kpi-subtext"/>
+        </VBox>
+
+        <!-- KPI 3: Đơn chờ duyệt -->
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="Đơn chờ duyệt (PENDING)" styleClass="kpi-title"/>
+            <Label fx:id="lblPending" text="0" styleClass="kpi-value, kpi-pending"/>
+            <Label text="Cần nhân viên xử lý" styleClass="kpi-subtext"/>
+        </VBox>
+    </HBox>
+
+</VBox>
