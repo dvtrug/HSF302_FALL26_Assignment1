@@ -21,6 +21,19 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Controller cho màn hình Dashboard tổng quan (TODO 37 - FXML: {@code dashboard.fxml}).
+ * <p>
+ * Tính năng:
+ * <ul>
+ *   <li>Hiển thị 3 thẻ KPI: Phim đang chiếu, Tổng khách hàng, Đơn chờ duyệt (PENDING)</li>
+ *   <li>Vẽ biểu đồ {@link BarChart} phân bổ suất chiếu hôm nay theo từng phòng chiếu (Q11)</li>
+ *   <li>Tự động làm mới số liệu mỗi 60 giây bằng {@link Timeline} ngầm</li>
+ *   <li>Lắng nghe vòng đời scene để tự dừng {@link Timeline} khi rời khỏi màn hình tránh rò rỉ bộ nhớ</li>
+ *   <li>Thực hiện các lệnh gọi dữ liệu bất đồng bộ qua {@link FxAsync} không gây nghẽn luồng UI JavaFX</li>
+ * </ul>
+ * </p>
+ */
 @Component
 @Scope("prototype")
 @RequiredArgsConstructor
@@ -41,6 +54,9 @@ public class DashboardController {
 
     private Timeline autoRefresh;
 
+    /**
+     * Khởi tạo giao diện, thiết lập chu kỳ tự động làm mới và tải dữ liệu lần đầu.
+     */
     @FXML
     private void initialize() {
         chartRooms.setAnimated(false);
@@ -59,11 +75,19 @@ public class DashboardController {
         refresh();
     }
 
+    /**
+     * Tải lại các chỉ số thống kê và dữ liệu biểu đồ trên Virtual Thread.
+     */
     @FXML
     public void refresh() {
         fxAsync.run(facade::load, this::render, btnRefresh);
     }
 
+    /**
+     * Cập nhật số liệu KPI và vẽ lại dữ liệu cột biểu đồ trên FX Application Thread.
+     *
+     * @param data đối tượng {@link DashboardData} đã được facade nạp từ CSDL
+     */
     private void render(DashboardData data) {
         lblShowing.setText(String.valueOf(data.showingMovies()));
         lblCustomers.setText(String.valueOf(data.customers()));
