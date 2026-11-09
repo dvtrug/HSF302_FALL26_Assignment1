@@ -3,12 +3,17 @@ package com.fu.cinema.desktop;
 import com.fu.cinema.desktop.facade.AuthFacade;
 import com.fu.cinema.desktop.session.DesktopSession;
 import com.fu.cinema.exception.BusinessException;
+import com.fu.cinema.service.AuthService;
+import javafx.beans.value.ChangeListener;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,6 +23,7 @@ class DesktopFacadeTest {
 
     @Autowired private AuthFacade auth;
     @Autowired private DesktopSession session;
+    @Autowired private AuthService webAuth;
 
     @BeforeEach
     @AfterEach
@@ -37,8 +43,8 @@ class DesktopFacadeTest {
 
     @Test
     void adminSessionPublishesDisplayNameAndClearsItAtLogout() {
-        var names = new java.util.ArrayList<String>();
-        javafx.beans.value.ChangeListener<String> listener = (observable, previous, name) -> names.add(name);
+        var names = new ArrayList<String>();
+        ChangeListener<String> listener = (observable, previous, name) -> names.add(name);
         session.displayNameProperty().addListener(listener);
         try {
             var admin = auth.loginAdmin("admin", "Admin@123");
@@ -50,7 +56,7 @@ class DesktopFacadeTest {
             session.logout();
 
             assertNull(session.getUser());
-            assertEquals(java.util.List.of(admin.getDisplayName(), ""), names);
+            assertEquals(List.of(admin.getDisplayName(), ""), names);
         } finally {
             session.displayNameProperty().removeListener(listener);
         }
@@ -63,6 +69,17 @@ class DesktopFacadeTest {
 
         assertTrue(error.getMessage().contains("bị khóa"));
         assertNull(session.getUser());
+        assertThrows(BusinessException.class, session::requireAdmin);
+    }
+
+    @Test
+    void adminGuardRejectsEvenAnAuthenticatedCustomerIdentity() {
+        var customer = webAuth.login("an.nv@gmail.com", "Customer@123");
+        assertTrue(customer.isCustomer());
+        session.login(customer);
+
+        assertThrows(BusinessException.class, session::requireAdmin);
+        session.logout();
         assertThrows(BusinessException.class, session::requireAdmin);
     }
 }
