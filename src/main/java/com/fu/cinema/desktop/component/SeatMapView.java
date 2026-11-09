@@ -6,6 +6,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 public class SeatMapView extends VBox {
@@ -22,7 +24,12 @@ public class SeatMapView extends VBox {
         seats.setAlignment(Pos.CENTER);
         seats.setHgap(5);
         seats.setVgap(5);
-        getChildren().addAll(screen, seats);
+        HBox legend = new HBox(18,
+                legendItem("Ghế trống", "legend-free"),
+                legendItem("Ghế đang chọn", "legend-selected"),
+                legendItem("Ghế đã bán", "legend-sold"));
+        legend.setAlignment(Pos.CENTER);
+        getChildren().addAll(screen, seats, legend);
     }
     public void setData(SeatMapData data) {
         seats.getChildren().clear();
@@ -43,5 +50,12 @@ public class SeatMapView extends VBox {
         seat.setDisable(sold);
         seat.setAccessibleText(sold ? code + " đã bán" : code);
         return seat;
+    }
+    private HBox legendItem(String label, String style) {
+        Region swatch = new Region();
+        swatch.getStyleClass().addAll("legend-swatch", style);
+        HBox item = new HBox(5, swatch, new Label(label));
+        item.setAlignment(Pos.CENTER_LEFT);
+        return item;
     }
 }
