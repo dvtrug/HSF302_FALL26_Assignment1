@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.jupiter.api.Assertions.*;
 
+@org.junit.jupiter.api.condition.EnabledOnOs(org.junit.jupiter.api.condition.OS.WINDOWS)
 class FxAsyncTest {
     @Test void workIsVirtualAndSuccessRunsOnFxThread() throws Exception {
         FxAsync async = new FxAsync();

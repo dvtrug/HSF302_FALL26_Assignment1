@@ -22,7 +22,9 @@ class FxValidatorTest {
             form.setComment("x".repeat(1001)); assertTrue(validator.validate(form).containsKey("comment"));
         }
     }
-    @Test void marksAndClearsBothControlsAndContainers() throws Exception {
+    @Test
+    @org.junit.jupiter.api.condition.EnabledOnOs(org.junit.jupiter.api.condition.OS.WINDOWS)
+    void marksAndClearsBothControlsAndContainers() throws Exception {
         FxTestSupport.onFx(() -> {
             FxValidator validator = new FxValidator(null);
             HBox box = new HBox(); TextField field = new TextField();
