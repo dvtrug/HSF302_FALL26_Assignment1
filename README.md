@@ -226,5 +226,6 @@ thiếu màn hình X, chạy `xvfb-run -a ./mvnw -B -ntp clean verify` để ki�
 các test JavaFX cần hiển thị.
 
 - [Bảng phân công và nhánh theo issue](docs/Assignment2_Board.md)
+- [Phân công 5 thành viên](docs/desktop-contributions.md)
 - [Ma trận nghiệm thu TC-D01–TC-D20](docs/desktop-acceptance.md)
 - [Các bước chuẩn bị và phát hành v2.0.0](docs/desktop-release.md)
