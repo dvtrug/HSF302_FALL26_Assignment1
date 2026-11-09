@@ -9,6 +9,10 @@ import com.fu.cinema.desktop.util.CsvExporter;
 import com.fu.cinema.desktop.util.FxAsync;
 import com.fu.cinema.desktop.util.MoneyUtil;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
@@ -16,6 +20,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -38,6 +43,8 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class ReportController {
 
+    private static final int PAGE_SIZE = 15;
+    private static final PseudoClass ERROR = PseudoClass.getPseudoClass("error");
     private static final DateTimeFormatter BOOKING_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final ReportFacade reports;
@@ -48,6 +55,10 @@ public class ReportController {
     @FXML private DatePicker toDate;
     @FXML private Button exportButton;
     @FXML private Label status;
+    @FXML private ProgressIndicator progress;
+    @FXML private Button previousPage;
+    @FXML private Button nextPage;
+    @FXML private Label pageStatus;
     @FXML private PieChart ticketsChart;
     @FXML private TableView<ReportBookingRow> bookingsTable;
     @FXML private TableColumn<ReportBookingRow, Long> idColumn;
@@ -59,7 +70,10 @@ public class ReportController {
 
     @FXML private BarChart<String, Number> revenueChart;
 
+    private final ObservableList<ReportBookingRow> allBookings = FXCollections.observableArrayList();
+    private final SortedList<ReportBookingRow> sortedBookings = new SortedList<>(allBookings);
     private ReportData current;
+    private int page;
 
     @FXML
     private void initialize() {
@@ -68,6 +82,14 @@ public class ReportController {
         toDate.setValue(today);
         fromDate.valueProperty().addListener((observable, previous, value) -> datesChanged());
         toDate.valueProperty().addListener((observable, previous, value) -> datesChanged());
+
+        progress.visibleProperty().bind(filters.disableProperty());
+        progress.managedProperty().bind(progress.visibleProperty());
+        bookingsTable.setSortPolicy(table -> {
+            sortedBookings.setComparator(table.getComparator());
+            showPage(0);
+            return true;
+        });
 
         bindColumn(idColumn, ReportBookingRow::id);
         bindColumn(dateColumn, ReportBookingRow::bookingDate);
@@ -95,6 +117,11 @@ public class ReportController {
     private void onGenerate() {
         LocalDate from = fromDate.getValue();
         LocalDate to = toDate.getValue();
+        String validationMessage = validateDates(from, to);
+        if (validationMessage != null) {
+            clearReport(validationMessage);
+            return;
+        }
         clearReport("Đang tải báo cáo…");
         async.run(() -> reports.generate(from, to), this::render, error -> {
             status.setText("Không thể tạo báo cáo.");
@@ -132,7 +159,45 @@ public class ReportController {
         }, filters);
     }
 
+    private String validateDates(LocalDate from, LocalDate to) {
+        boolean reversed = from != null && to != null && to.isBefore(from);
+        markDate(fromDate, from == null ? "Vui lòng chọn từ ngày." : null);
+        markDate(toDate, to == null ? "Vui lòng chọn đến ngày."
+                : reversed ? "Đến ngày phải sau hoặc bằng từ ngày." : null);
+        if (from == null || to == null) {
+            return "Vui lòng chọn đầy đủ từ ngày và đến ngày.";
+        }
+        return reversed ? "Đến ngày phải sau hoặc bằng từ ngày." : null;
+    }
+
+    private void markDate(DatePicker picker, String message) {
+        picker.pseudoClassStateChanged(ERROR, message != null);
+        picker.setTooltip(message == null ? null : new Tooltip(message));
+    }
+
+    @FXML
+    private void onPreviousPage() {
+        showPage(page - 1);
+    }
+
+    @FXML
+    private void onNextPage() {
+        showPage(page + 1);
+    }
+
+    private void showPage(int requested) {
+        int pages = Math.ceilDiv(sortedBookings.size(), PAGE_SIZE);
+        page = Math.clamp(requested, 0, Math.max(0, pages - 1));
+        int start = page * PAGE_SIZE;
+        bookingsTable.getItems().setAll(sortedBookings.subList(start, Math.min(start + PAGE_SIZE, sortedBookings.size())));
+        previousPage.setDisable(page == 0);
+        nextPage.setDisable(page + 1 >= pages);
+        pageStatus.setText("Trang " + (pages == 0 ? 0 : page + 1) + " / " + pages);
+    }
+
     private void datesChanged() {
+        markDate(fromDate, null);
+        markDate(toDate, null);
         clearReport("Khoảng ngày đã thay đổi. Chọn Xem báo cáo để cập nhật.");
     }
 
@@ -141,7 +206,8 @@ public class ReportController {
         exportButton.setDisable(true);
         revenueChart.getData().clear();
         ticketsChart.getData().clear();
-        bookingsTable.getItems().clear();
+        allBookings.clear();
+        showPage(0);
         status.setText(message);
     }
 
@@ -155,7 +221,8 @@ public class ReportController {
         ticketsChart.getData().setAll(data.revenueByMovie().stream()
                 .map(row -> new PieChart.Data(row.movieTitle() + " (" + row.ticketCount() + " vé)", row.ticketCount()))
                 .toList());
-        bookingsTable.getItems().setAll(data.bookings());
+        allBookings.setAll(data.bookings());
+        showPage(0);
         current = data;
         exportButton.setDisable(data.isEmpty());
         status.setText(data.isEmpty() ? "Không có đơn đã xác nhận trong khoảng ngày đã chọn."

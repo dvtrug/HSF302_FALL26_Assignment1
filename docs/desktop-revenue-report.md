@@ -8,7 +8,7 @@ chung với báo cáo web tại `/admin/reports`.
 - Biểu đồ cột tổng hợp tiền vé theo phim. Rê chuột lên cột để xem tên phim,
   số vé và doanh thu. Số thứ tự tách các phim trùng tên trên trục ngang.
 - Biểu đồ tròn thể hiện số vé từng phim chia cho tổng số vé đã xác nhận.
-- Bảng đơn mặc định xếp theo ngày đặt mới nhất. Dòng tổng hiển thị số đơn,
+- Bảng đơn mặc định xếp theo ngày đặt mới nhất. Bấm tên cột để sắp toàn bộ kết quả, dùng nút trang trước/sau để xem 15 đơn mỗi trang. Dòng tổng hiển thị số đơn,
   số vé và doanh thu. Kỳ rỗng hiện thông báo và khóa nút xuất CSV.
 
 **Xuất CSV** lưu các đơn đã xác nhận của kỳ đang hiển thị. File dùng UTF-8
