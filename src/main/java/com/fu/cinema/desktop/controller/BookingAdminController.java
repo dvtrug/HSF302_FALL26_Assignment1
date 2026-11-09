@@ -7,6 +7,12 @@ import com.fu.cinema.desktop.util.MoneyUtil;
 import com.fu.cinema.desktop.util.FxAsync;
 import com.fu.cinema.desktop.util.AlertUtil;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import javafx.concurrent.Task;
+import java.time.format.DateTimeFormatter;
+import java.util.function.Function;
 import com.fu.cinema.enums.BookingStatus;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -42,6 +48,10 @@ public class BookingAdminController {
     @FXML private Label lblError, lblTotal;
     private final BooleanProperty busy = new SimpleBooleanProperty();
     private FxAsync.TaskGroup tasks;
+    private Task<?> pendingLoad;
+    private long requestVersion;
+    private boolean renderingPage;
+    private final PauseTransition debounce = new PauseTransition(Duration.millis(300));
 
     @FXML private void initialize() {
         tasks = async.forView(root);
@@ -72,9 +82,38 @@ public class BookingAdminController {
             });
             return row;
         });
+        column(colId, BookingRow::id); column(colCustomer, BookingRow::customerName);
+        column(colMovie, BookingRow::movieTitle); column(colRoom, BookingRow::roomName);
+        column(colStart, BookingRow::startTime); column(colDate, BookingRow::bookingDate);
+        column(colSeats, BookingRow::seatCount); column(colTotal, BookingRow::total); column(colStatus, BookingRow::status);
+        dateCell(colStart); dateCell(colDate);
+        colTotal.setCellFactory(c -> new TableCell<>() {
+            @Override protected void updateItem(BigDecimal amount, boolean empty) {
+                super.updateItem(amount, empty); setText(empty ? null : MoneyUtil.format(amount));
+            }
+        });
+        cbStatus.setConverter(new javafx.util.StringConverter<>() {
+            @Override public String toString(BookingStatus status) { return status == null ? "Tất cả trạng thái" : status.name(); }
+            @Override public BookingStatus fromString(String value) { return null; }
+        });
+        cbStatus.valueProperty().addListener((p, old, value) -> onSearch());
+        dpFrom.valueProperty().addListener((p, old, value) -> onSearch());
+        dpTo.valueProperty().addListener((p, old, value) -> onSearch());
+        debounce.setOnFinished(e -> onSearch());
+        tfKeyword.textProperty().addListener((p, old, value) -> debounce.playFromStart());
+        tfKeyword.setOnAction(e -> onSearch());
+        pagination.currentPageIndexProperty().addListener((p, old, value) -> {
+            if (!renderingPage) load(value.intValue());
+        });
+        root.sceneProperty().addListener((p, old, value) -> { if (old != null && value == null) debounce.stop(); });
+        load(0);
     }
-    @FXML private void onSearch() { }
-    @FXML private void onRefresh() { }
+    @FXML private void onSearch() {
+        debounce.stop();
+        renderingPage = true; pagination.setCurrentPageIndex(0); renderingPage = false;
+        load(0);
+    }
+    @FXML private void onRefresh() { load(pagination.getCurrentPageIndex()); }
     @FXML private void onConfirm() { changeStatus(true); }
     @FXML private void onCancel() { changeStatus(false); }
 
@@ -111,5 +150,41 @@ public class BookingAdminController {
                 + "\nGiờ chiếu: " + d.startTime() + "\nGhế: " + String.join(", ", d.seats())
                 + "\nTổng tiền: " + MoneyUtil.format(d.total()) + "\nTrạng thái: " + d.status()
                 + "\nNgày đặt: " + d.bookingDate();
+    }
+
+    private void load(int page) {
+        long version = ++requestVersion;
+        if (pendingLoad != null) pendingLoad.cancel(true);
+        var status = cbStatus.getValue(); var from = dpFrom.getValue(); var to = dpTo.getValue();
+        String keyword = tfKeyword.getText();
+        busy.set(true); lblError.setText("");
+        pendingLoad = tasks.run(() -> facade.search(status, from, to, keyword, page), result -> {
+            if (version != requestVersion) return;
+            if (page >= result.totalPages()) { load(result.totalPages() - 1); return; }
+            table.getItems().setAll(result.items());
+            renderingPage = true;
+            pagination.setPageCount(result.totalPages()); pagination.setCurrentPageIndex(result.page());
+            renderingPage = false;
+            lblTotal.setText(result.totalElements() + " đơn"); busy.set(false);
+        }, ex -> {
+            if (version != requestVersion) return;
+            busy.set(false);
+            lblError.setText(ex instanceof com.fu.cinema.exception.BusinessException ? ex.getMessage() : "Không tải được danh sách đơn");
+            table.getItems().clear(); lblTotal.setText("");
+            if (!(ex instanceof com.fu.cinema.exception.BusinessException)) AlertUtil.showError(ex);
+        });
+    }
+
+    private <T> void column(TableColumn<BookingRow, T> column, Function<BookingRow, T> value) {
+        column.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(value.apply(c.getValue())));
+    }
+
+    private void dateCell(TableColumn<BookingRow, LocalDateTime> column) {
+        column.setCellFactory(c -> new TableCell<>() {
+            @Override protected void updateItem(LocalDateTime value, boolean empty) {
+                super.updateItem(value, empty);
+                setText(empty || value == null ? null : value.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+            }
+        });
     }
 }
