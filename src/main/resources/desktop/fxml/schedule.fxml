@@ -11,6 +11,9 @@
             <Tab fx:id="tabRooms" text="Quản lý phòng chiếu">
                 <fx:include source="room-tab.fxml" fx:id="roomTab"/>
             </Tab>
+            <Tab fx:id="tabShowtimes" text="Quản lý suất chiếu">
+                <fx:include source="showtime-tab.fxml" fx:id="showtimeTab"/>
+            </Tab>
         </tabs>
     </TabPane>
 </VBox>
