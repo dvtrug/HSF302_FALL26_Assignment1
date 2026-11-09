@@ -17,7 +17,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-
+/**
+ * Controller FXML điều khiển màn hình Quản lý Thể loại (genre.fxml).
+ * <p>
+ * Áp dụng mô hình Master-Detail, kết nối với {@link GenreFacade} thông qua {@link FxAsync}
+ * để đảm bảo không chặn JavaFX Application Thread, và sử dụng {@link FxValidator} để phản hồi lỗi form.
+ */
 @Component
 @Scope("prototype")
 @RequiredArgsConstructor

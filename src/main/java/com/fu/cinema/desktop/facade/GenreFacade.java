@@ -10,7 +10,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
+/**
+ * Facade chịu trách nhiệm cung cấp nghiệp vụ Quản lý Thể loại cho giao diện Desktop.
+ * <p>
+ * Luồng hoạt động:
+ * <ul>
+ *   <li>Thao tác đọc dữ liệu {@link #findAll()} bọc trong read-only transaction.</li>
+ *   <li>Thao tác ghi {@link #save(GenreForm)} và {@link #delete(Long)} bắt buộc phiên đăng nhập Admin (BR-D1).</li>
+ *   <li>Quy tắc BR-05: Kiểm tra và ngăn chặn việc xoá thể loại khi còn phim liên kết.</li>
+ * </ul>
+ */
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
