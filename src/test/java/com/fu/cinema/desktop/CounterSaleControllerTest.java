@@ -15,6 +15,7 @@ import com.fu.cinema.repository.BookingRepository;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -35,6 +36,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -133,11 +138,14 @@ class CounterSaleControllerTest {
 
         onFx(() -> {
             seat(map, "A1").fire();
+            seat(map, "A3").fire();
+            seat(map, "A4").fire();
             var total = (Label) view.getNamespace().get("total");
-            assertTrue(total.getText().contains("1 ghế"));
-            assertTrue(total.getText().contains("80.000"));
+            assertTrue(total.getText().contains("3 ghế"));
+            assertTrue(total.getText().contains("240.000"));
             ((CheckBox) view.getNamespace().get("paid")).setSelected(true);
             assertFalse(sell.isDisabled());
+            capture(stage.getScene().getRoot(), "02-three-seats-total.png");
             return null;
         });
         long before = bookingRepository.count();
@@ -146,8 +154,8 @@ class CounterSaleControllerTest {
         assertEquals(before, bookingRepository.count(), "Declining must not write a booking");
         assertFalse(onFx(sell::isDisabled));
         Platform.runLater(sell::fire);
-        answerDialog(stage, "80.000", ButtonType.YES);
-        closeDialog(stage, "CONFIRMED");
+        answerDialog(stage, "240.000", ButtonType.YES);
+        answerDialog(stage, "CONFIRMED", ButtonType.OK, "03-paid-confirmed.png", "A1, A3, A4", "240.000", "#");
         awaitFx(() -> map.isVisible() && seat(map, "A1").isDisabled());
 
         var request = new BookingRequest();
@@ -163,12 +171,43 @@ class CounterSaleControllerTest {
         });
         Platform.runLater(sell::fire);
         answerDialog(stage, "A2", ButtonType.YES);
-        closeDialog(stage, "Ghế đã có người đặt");
+        answerDialog(stage, "Ghế đã có người đặt", ButtonType.OK, "06-seat-conflict.png", "A2");
         awaitFx(() -> map.isVisible() && seat(map, "A2").isDisabled());
         assertTrue(onFx(sell::isDisabled));
+
+        onFx(() -> {
+            seat(map, "A5").fire();
+            assertFalse(((CheckBox) view.getNamespace().get("paid")).isSelected());
+            return null;
+        });
+        Platform.runLater(sell::fire);
+        answerDialog(stage, "PENDING", ButtonType.YES);
+        answerDialog(stage, "PENDING", ButtonType.OK, "04-unpaid-pending.png", "A5", "80.000", "#");
+        awaitFx(() -> map.isVisible() && seat(map, "A5").isDisabled());
+
+        onFx(() -> { ((TextField) view.getNamespace().get("customerQuery")).setText("Tran Thi Binh"); return null; });
+        awaitFx(() -> !customers.getItems().isEmpty());
+        onFx(() -> {
+            customers.getSelectionModel().selectFirst();
+            movies.setValue(movies.getItems().stream().filter(item -> item.title().equals("Ngôi Nhà Bí Ẩn"))
+                    .findFirst().orElseThrow());
+            return null;
+        });
+        awaitFx(() -> !showtimes.getItems().isEmpty());
+        onFx(() -> { showtimes.getSelectionModel().selectFirst(); return null; });
+        awaitFx(map::isVisible);
+        long beforeUnderage = bookingRepository.count();
+        onFx(() -> { seat(map, "A1").fire(); return null; });
+        Platform.runLater(sell::fire);
+        answerDialog(stage, "PENDING", ButtonType.YES);
+        answerDialog(stage, "18 tuổi", ButtonType.OK, "05-underage-error.png", "Ngôi Nhà Bí Ẩn");
+        awaitFx(() -> map.isVisible() && !seat(map, "A1").isDisabled());
+        assertEquals(beforeUnderage, bookingRepository.count(), "Underage failure must not create an order");
+        assertTrue(onFx(() -> map.getSelectedSeats().isEmpty() && sell.isDisabled()));
+        onFx(() -> { capture(stage.getScene().getRoot(), "07-refreshed-seat-map.png"); return null; });
     }
 
-    private static ToggleButton seat(SeatMapView view, String code) {
+    static ToggleButton seat(SeatMapView view, String code) {
         return view.lookupAll(".seat").stream().map(ToggleButton.class::cast)
                 .filter(button -> code.equals(button.getText())).findFirst().orElseThrow();
     }
@@ -177,7 +216,7 @@ class CounterSaleControllerTest {
         answerDialog(stage, expected, ButtonType.OK);
     }
 
-    private static void answerDialog(Stage stage, String expected, ButtonType answer) throws Exception {
+    static void answerDialog(Stage stage, String expected, ButtonType answer, String... proofAndExpected) throws Exception {
         awaitFx(() -> Window.getWindows().stream().anyMatch(window ->
                 window != stage && window.isShowing() && window.getScene().getRoot() instanceof DialogPane));
         onFx(() -> {
@@ -189,6 +228,10 @@ class CounterSaleControllerTest {
                 var content = ((javafx.scene.control.ScrollPane) pane.getContent()).getContent();
                 String text = ((Label) content).getText();
                 assertTrue(text.contains(expected), text);
+                if (proofAndExpected.length > 0) {
+                    for (int i = 1; i < proofAndExpected.length; i++) assertTrue(text.contains(proofAndExpected[i]), text);
+                    capture(pane, proofAndExpected[0]);
+                }
                 assertNotNull(pane.lookupButton(answer), "Expected confirmation/notification button " + answer);
                 ((Button) pane.lookupButton(answer)).fire();
             } finally {
@@ -198,7 +241,22 @@ class CounterSaleControllerTest {
         });
     }
 
-    private static void awaitFx(Callable<Boolean> predicate) throws Exception {
+    static void capture(Node node, String filename) throws Exception {
+        String directory = System.getProperty("fu.evidence.dir");
+        if (directory == null) return;
+        node.applyCss();
+        if (node instanceof Parent parent) parent.layout();
+        var snapshot = node.snapshot(null, null);
+        var image = new BufferedImage((int) snapshot.getWidth(), (int) snapshot.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        var pixels = snapshot.getPixelReader();
+        for (int y = 0; y < image.getHeight(); y++)
+            for (int x = 0; x < image.getWidth(); x++) image.setRGB(x, y, pixels.getArgb(x, y));
+        Path destination = Path.of(directory).resolve(filename);
+        Files.createDirectories(destination.getParent());
+        ImageIO.write(image, "png", destination.toFile());
+    }
+
+    static void awaitFx(Callable<Boolean> predicate) throws Exception {
         long end = System.nanoTime() + TimeUnit.SECONDS.toNanos(12);
         do {
             if (onFx(predicate)) return;
@@ -207,7 +265,7 @@ class CounterSaleControllerTest {
         fail("Timed out waiting for JavaFX state");
     }
 
-    private static <T> T onFx(Callable<T> action) throws Exception {
+    static <T> T onFx(Callable<T> action) throws Exception {
         var task = new FutureTask<>(action);
         Platform.runLater(task);
         return task.get(15, TimeUnit.SECONDS);
