@@ -25,8 +25,8 @@ Windows, JDK 21, JavaFX và dữ liệu mẫu H2 theo profile `test`.
 | TC-D12 | #53 | Suất trùng phòng/giờ và suất có đơn | Chặn trùng lịch. Hủy suất có đơn làm các đơn liên quan CANCELLED. | Chờ màn hình suất chiếu. | Chờ |
 | TC-D13 | #54 | Phòng 8×12, A1 đã bán | Hiện đúng 96 ghế. A1 bị khóa và không thể chọn. | `SeatMapViewTest` xác nhận 96 nút và A1 không vào danh sách chọn. | Pass |
 | TC-D14 | #54 | Chọn 8 ghế rồi chọn ghế thứ 9 | Hiện cảnh báo, ghế thứ 9 tự bỏ chọn và tổng vẫn là 8. | Test JavaFX và ảnh hộp thoại xác nhận cảnh báo và giới hạn. | Pass |
-| TC-D15 | #55 | Chọn khách, phim, suất, ghế và Đã thanh toán | Tổng tiền đúng, đơn CONFIRMED sau khi bán. | Chờ màn hình bán vé tích hợp. | Chờ |
-| TC-D16 | #55 | Web và desktop đặt cùng ghế | Chỉ một đơn thành công. Bên thua thấy cảnh báo và ghế vừa bán. | Chờ màn hình bán vé tích hợp. | Chờ |
+| TC-D15 | #55 | Chọn khách, phim, suất, ghế và Đã thanh toán | Tổng tiền đúng, đơn CONFIRMED sau khi bán. | `CounterSaleControllerTest` chọn ghế, đối chiếu tổng và xác nhận đơn CONFIRMED qua JavaFX/H2. | Pass |
+| TC-D16 | #55 | Web và desktop đặt cùng ghế | Chỉ một đơn thành công. Bên thua thấy cảnh báo và ghế vừa bán. | MockMvc gọi endpoint đặt vé web đồng thời với UI quầy trên SQL Express 17.0. Chỉ một bên thành công, bên thua báo lỗi và sơ đồ cập nhật. | Pass |
 | TC-D17 | #56 | Các đơn PENDING, CONFIRMED, CANCELLED | Xác nhận/hủy theo trạng thái, chặn đổi đơn CANCELLED. | Test web kiểm tra chuyển trạng thái. Chờ nghiệm thu desktop. | Chờ |
 | TC-D18a | #57 | Cùng kỳ có dữ liệu trên web và desktop | Tổng đơn, vé, tiền và danh sách đơn CONFIRMED khớp. | `ReportFacadeTest` đối chiếu với service web trên H2, dữ liệu map trong transaction. | Pass |
 | TC-D18b | #57 | Ngày thiếu hoặc ngày kết thúc trước ngày bắt đầu | Service từ chối. UI báo đúng trường và không truy vấn. | `ReportFacadeTest` nhận BusinessException. `ReportControllerTest` xác nhận đánh dấu trường và không gọi facade. | Pass |
@@ -43,3 +43,8 @@ Trên nhánh #58, `clean verify` chạy 111 test, 0 lỗi và 0 bỏ qua trên
 Windows. JaCoCo ghi nhận 354/465 dòng service và facade được chạy
 (**76,13%**). Mở `target/site/jacoco/index.html` sau khi chạy verify
 để xem chi tiết theo lớp.
+
+Bản ghép #54, #55, #57, #58 và dependency #46 đạt **136 test** trên
+Windows, 0 lỗi và 0 bỏ qua. JaCoCo ghi nhận **78,46%** (386/492 dòng)
+ở phạm vi service và desktop facade. TC-D16 còn cần chạy lại với
+SQL Server 2019/2022 của môi trường nộp.
