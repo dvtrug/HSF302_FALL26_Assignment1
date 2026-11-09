@@ -5,6 +5,7 @@ import com.fu.cinema.desktop.model.MovieItem;
 import com.fu.cinema.desktop.model.RoomItem;
 import com.fu.cinema.desktop.model.ShowtimeRow;
 import com.fu.cinema.enums.ShowtimeStatus;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -14,7 +15,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Controller managing the showtime scheduling tab (showtime-tab.fxml).
@@ -132,11 +136,41 @@ public class ShowtimeController {
         // Disable past dates in date picker
         dpDate.setDayCellFactory(p -> new DateCell() {
             @Override
-            public void updateItem(java.time.LocalDate d, boolean empty) {
+            public void updateItem(LocalDate d, boolean empty) {
                 super.updateItem(d, empty);
-                setDisable(empty || d.isBefore(java.time.LocalDate.now()));
+                setDisable(empty || d.isBefore(LocalDate.now()));
             }
         });
+
+        // Bind suggested EndTime calculation: StartTime + Movie Duration + 15' room cleanup
+        DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("HH:mm dd/MM");
+        lblEnd.textProperty().bind(Bindings.createStringBinding(() -> {
+            LocalDateTime end = suggestedEnd();
+            return end == null ? "Kết thúc (gợi ý): -" : "Kết thúc (gợi ý): " + end.format(endFormatter);
+        }, cbMovie.valueProperty(), dpDate.valueProperty(), spHour.valueProperty(), spMinute.valueProperty()));
+
+        // Commit spinner values on focus lost
+        spHour.focusedProperty().addListener((obs, oldV, newV) -> {
+            if (!newV) spHour.commitValue();
+        });
+        spMinute.focusedProperty().addListener((obs, oldV, newV) -> {
+            if (!newV) spMinute.commitValue();
+        });
+    }
+
+    public LocalDateTime startTime() {
+        if (dpDate.getValue() == null || spHour.getValue() == null || spMinute.getValue() == null) {
+            return null;
+        }
+        return LocalDateTime.of(dpDate.getValue(), LocalTime.of(spHour.getValue(), spMinute.getValue()));
+    }
+
+    public LocalDateTime suggestedEnd() {
+        LocalDateTime start = startTime();
+        if (start == null || cbMovie.getValue() == null) {
+            return null;
+        }
+        return start.plusMinutes(cbMovie.getValue().duration() + 15L);
     }
 
     @FXML
