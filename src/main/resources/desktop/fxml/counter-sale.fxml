@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.fu.cinema.desktop.component.SeatMapView?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:id="root" fx:controller="com.fu.cinema.desktop.controller.CounterSaleController"
+      styleClass="page" stylesheets="@../../css/desktop-counter-sale.css">
+    <Label text="Bán vé tại quầy" styleClass="page-title"/>
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <ProgressIndicator fx:id="progress" styleClass="counter-progress" visible="false" managed="false"/>
+        <Label fx:id="status" text="Chọn khách hàng, phim và suất chiếu." wrapText="true"/>
+    </HBox>
+    <HBox fx:id="form" spacing="16" VBox.vgrow="ALWAYS">
+        <VBox spacing="8" styleClass="counter-controls" prefWidth="300" minWidth="240">
+            <Label text="Khách hàng"/>
+            <TextField fx:id="customerQuery" promptText="Tên, số điện thoại hoặc email"/>
+            <ListView fx:id="customerResults" prefHeight="124">
+                <placeholder><Label text="Nhập từ khóa để tìm khách hàng."/></placeholder>
+            </ListView>
+            <Label text="Phim"/>
+            <ComboBox fx:id="movie" promptText="Chọn phim" maxWidth="Infinity"/>
+            <Label text="Suất chiếu"/>
+            <ComboBox fx:id="showtime" promptText="Chọn suất chiếu" maxWidth="Infinity"/>
+            <CheckBox fx:id="paid" text="Đã thanh toán"/>
+            <Label fx:id="total" styleClass="counter-total" wrapText="true"/>
+            <Button fx:id="sellButton" text="Bán vé" styleClass="primary" onAction="#onSell" maxWidth="Infinity"/>
+        </VBox>
+        <ScrollPane fitToWidth="true" pannable="true" HBox.hgrow="ALWAYS" styleClass="counter-seat-scroll">
+            <VBox spacing="12" styleClass="counter-seats">
+                <Label fx:id="seatHint" text="Chọn suất chiếu để hiển thị sơ đồ ghế." wrapText="true"/>
+                <SeatMapView fx:id="seatMap" visible="false" managed="false"/>
+            </VBox>
+        </ScrollPane>
+    </HBox>
+</VBox>
