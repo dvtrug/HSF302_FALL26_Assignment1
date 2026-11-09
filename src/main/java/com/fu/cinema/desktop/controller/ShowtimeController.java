@@ -91,8 +91,64 @@ public class ShowtimeController {
     private Label lblFormTitle;
 
     @FXML
+    private ComboBox<MovieItem> cbMovie;
+
+    @FXML
+    private ComboBox<RoomItem> cbRoom;
+
+    @FXML
+    private DatePicker dpDate;
+
+    @FXML
+    private Spinner<Integer> spHour;
+
+    @FXML
+    private Spinner<Integer> spMinute;
+
+    @FXML
+    private TextField tfPrice;
+
+    @FXML
+    private Label lblEnd;
+
+    @FXML
+    private Button btnNew;
+
+    @FXML
+    private Button btnDelete;
+
+    @FXML
+    private Button btnSave;
+
+    private Long editingId;
+
+    @FXML
     private void initialize() {
-        // Initial setup for filter controls and table columns
+        // Setup spinners and text formatter for input form
+        spHour.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 19));
+        spMinute.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 55, 0, 5));
+        tfPrice.setTextFormatter(new TextFormatter<>(c -> c.getControlNewText().matches("\\d{0,9}") ? c : null));
+
+        // Disable past dates in date picker
+        dpDate.setDayCellFactory(p -> new DateCell() {
+            @Override
+            public void updateItem(java.time.LocalDate d, boolean empty) {
+                super.updateItem(d, empty);
+                setDisable(empty || d.isBefore(java.time.LocalDate.now()));
+            }
+        });
+    }
+
+    @FXML
+    public void onNew() {
+    }
+
+    @FXML
+    public void onDelete() {
+    }
+
+    @FXML
+    public void onSave() {
     }
 
     @FXML

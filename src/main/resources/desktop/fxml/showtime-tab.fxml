@@ -45,9 +45,53 @@
     </VBox>
 
     <!-- Right panel: Showtime input form -->
-    <VBox fx:id="formBox" spacing="14" styleClass="kpi-card" prefWidth="380" minWidth="340">
+    <VBox fx:id="formBox" spacing="12" styleClass="kpi-card" prefWidth="380" minWidth="340">
         <Label fx:id="lblFormTitle" text="Thêm suất chiếu mới" styleClass="section-title"/>
-        <Label text="Chọn suất chiếu từ danh sách hoặc nhập thông tin bên dưới." styleClass="text-muted"/>
+
+        <VBox spacing="4">
+            <Label text="Chọn phim (*)" styleClass="field-label"/>
+            <ComboBox fx:id="cbMovie" maxWidth="Infinity" promptText="Chọn phim chiếu"/>
+        </VBox>
+
+        <VBox spacing="4">
+            <Label text="Phòng chiếu (*)" styleClass="field-label"/>
+            <ComboBox fx:id="cbRoom" maxWidth="Infinity" promptText="Chọn phòng chiếu"/>
+        </VBox>
+
+        <VBox spacing="4">
+            <Label text="Ngày chiếu (*)" styleClass="field-label"/>
+            <DatePicker fx:id="dpDate" maxWidth="Infinity" promptText="Chọn ngày chiếu"/>
+        </VBox>
+
+        <HBox spacing="12">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Giờ bắt đầu (0–23)" styleClass="field-label"/>
+                <Spinner fx:id="spHour" editable="true" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Phút bắt đầu (0–55)" styleClass="field-label"/>
+                <Spinner fx:id="spMinute" editable="true" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
+
+        <VBox spacing="4">
+            <Label text="Giá vé (VNĐ, tối thiểu 1.000đ) (*)" styleClass="field-label"/>
+            <TextField fx:id="tfPrice" promptText="VD: 75000"/>
+        </VBox>
+
+        <VBox spacing="4">
+            <Label text="Giờ kết thúc dự kiến:" styleClass="field-label"/>
+            <Label fx:id="lblEnd" text="Kết thúc (gợi ý): -" styleClass="kpi-value, kpi-showing"/>
+        </VBox>
+
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <!-- Form Action Buttons -->
+        <HBox spacing="8" alignment="CENTER_RIGHT">
+            <Button fx:id="btnNew" text="Làm lại" onAction="#onNew" styleClass="button"/>
+            <Button fx:id="btnDelete" text="Xoá" onAction="#onDelete" styleClass="button"/>
+            <Button fx:id="btnSave" text="Lưu suất chiếu" onAction="#onSave" styleClass="button, primary"/>
+        </HBox>
     </VBox>
 
 </HBox>
