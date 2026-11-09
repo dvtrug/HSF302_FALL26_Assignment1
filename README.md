@@ -199,3 +199,32 @@ Nhóm áp dụng nghiêm ngặt quy trình làm việc chuyên nghiệp:
 * **Báo cáo hoàn chỉnh (Word):** [docs/Assignment1_Report_Group6.docx](docs/Assignment1_Report_Group6.docx)
 * **Trưởng nhóm:** Đỗ Võ Thanh Trung (`thanhtrungxxz@gmail.com`).
 * **GitHub Project:** [https://github.com/dvtrug/HSF302_FALL26_Assignment1](https://github.com/dvtrug/HSF302_FALL26_Assignment1)
+
+## 10. FU Cinema Desktop (Assignment 2)
+
+Cần JDK 21, Maven Wrapper đi kèm và môi trường có giao diện đồ họa. Web và
+desktop dùng chung SQL Server. Tạo `application-local.properties` như mục 5,
+sau đó mở PowerShell tại thư mục gốc và chọn lệnh theo giao diện cần chạy.
+
+```powershell
+# Desktop (JavaFX, không khởi động máy chủ web)
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=local,desktop' '-Dspring-boot.run.main-class=com.fu.cinema.desktop.DesktopLauncher'
+
+# Web tại http://localhost:8080
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=local' '-Dspring-boot.run.main-class=com.fu.cinema.FuCinemaTicketSystemApplication'
+```
+
+Tài khoản demo desktop là `admin` với mật khẩu `Admin@123`. Đăng nhập desktop
+yêu cầu quyền ADMIN. Để thử desktop với dữ liệu mẫu trên H2 trong bộ nhớ:
+
+```powershell
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=test,desktop' '-Dspring-boot.run.useTestClasspath=true' '-Dspring-boot.run.main-class=com.fu.cinema.desktop.DesktopLauncher'
+```
+
+Chạy `.\mvnw.cmd -B -ntp clean verify` để kiểm thử và đóng gói. Trên Linux
+thiếu màn hình X, chạy `xvfb-run -a ./mvnw -B -ntp clean verify` để kiểm tra cả
+các test JavaFX cần hiển thị.
+
+- [Bảng phân công và nhánh theo issue](docs/Assignment2_Board.md)
+- [Ma trận nghiệm thu TC-D01–TC-D20](docs/desktop-acceptance.md)
+- [Các bước chuẩn bị và phát hành v2.0.0](docs/desktop-release.md)
