@@ -29,6 +29,7 @@ public class CounterSaleFacade {
     private final DesktopSession session;
 
     public List<CustomerItem> searchCustomers(String keyword) {
+        session.requireAdmin();
         return customers.search(keyword, 0, 20).map(c -> new CustomerItem(c.getCustomerId(), c.getFullName(),
                 c.getMobile(), Period.between(c.getBirthday(), LocalDate.now()).getYears())).getContent();
     }

@@ -76,6 +76,14 @@ class CounterSaleFacadeTest {
         session.logout(); assertThrows(BusinessException.class,()->facade.sell(customerId,showtimeId,List.of("A1"),true));
         assertEquals(before,bookings.count());
     }
+    @Test void customerChoicesRequireAnAdminSession() {
+        session.logout();
+        assertThrows(BusinessException.class, () -> facade.searchCustomers("An"));
+        session.login(SessionUser.builder().accountId(99L).role(Role.CUSTOMER).displayName("Customer").build());
+        assertThrows(BusinessException.class, () -> facade.searchCustomers("An"));
+        session.login(SessionUser.builder().accountId(1L).role(Role.ADMIN).displayName("Admin").build());
+        assertFalse(facade.searchCustomers("An").isEmpty());
+    }
     @Test void failedConfirmationRollsBackNewBookingAndTickets() {
         long orders=bookings.count(), ticketCount=tickets.count();
         doThrow(new BusinessException("Confirmation failed")).when(bookingService).confirm(anyLong());
