@@ -50,7 +50,17 @@ public class GenreController {
     private void initialize() {
         setupTable();
         setupSelectionListener();
+        bindButtonStates();
         onReload();
+    }
+    private void bindButtonStates() {
+        // Khóa nút Lưu khi ô tên thể loại rỗng
+        btnSave.disableProperty().bind(tfGenreName.textProperty().isEmpty());
+        // Khóa nút Xóa khi chưa chọn dòng nào trên bảng
+        btnDelete.setDisable(true);
+        tableGenres.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, selected) -> {
+            btnDelete.setDisable(selected == null);
+        });
     }
 
     private void setupTable() {
@@ -69,6 +79,22 @@ public class GenreController {
                 lblFormTitle.setText("Chỉnh sửa thể loại #" + selectedGenreId);
             }
         });
+    }
+    private GenreForm buildForm() {
+        GenreForm form = new GenreForm();
+        form.setGenreId(selectedGenreId);
+        form.setGenreName(tfGenreName.getText() != null ? tfGenreName.getText().trim() : "");
+        form.setDescription(taDescription.getText() != null ? taDescription.getText().trim() : "");
+        return form;
+    }
+
+    private boolean validateForm(GenreForm form) {
+        Map<String, String> errors = fxValidator.validate(form);
+        Map<String, Control> fields = Map.of(
+                "genreName", tfGenreName,
+                "description", taDescription
+        );
+        return fxValidator.mark(errors, fields);
     }
 
     @FXML
