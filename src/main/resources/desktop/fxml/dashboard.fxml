@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
@@ -42,5 +45,18 @@
             <Label text="Cần nhân viên xử lý" styleClass="kpi-subtext"/>
         </VBox>
     </HBox>
+
+    <!-- BarChart Section for today's showtimes by room -->
+    <VBox spacing="8" VBox.vgrow="ALWAYS" styleClass="chart-card">
+        <Label text="Suất chiếu hôm nay theo phòng" styleClass="section-title"/>
+        <BarChart fx:id="chartRooms" legendVisible="false" animated="false" VBox.vgrow="ALWAYS">
+            <xAxis>
+                <CategoryAxis label="Phòng chiếu"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Số suất chiếu" minorTickVisible="false" tickUnit="1" autoRanging="true"/>
+            </yAxis>
+        </BarChart>
+    </VBox>
 
 </VBox>
