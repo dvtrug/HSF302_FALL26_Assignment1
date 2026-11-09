@@ -57,6 +57,31 @@ public class MovieController {
     private void initialize() {
         setupColumns();
         loadFilters();
+        setupSearchDebounce();
+        pagination.setPageFactory(pageIndex -> {
+            loadPage(pageIndex);
+            return new Label(); // Dummy node, bảng cập nhật trực tiếp qua movieList
+        });
+    }
+    public void loadPage(int page) {
+        progress.setVisible(true);
+        String kw = tfKeyword.getText() != null ? tfKeyword.getText().trim() : "";
+        Long genreId = cbGenre.getValue() != null ? cbGenre.getValue().genreId() : null;
+        MovieStatus st = cbStatus.getValue();
+        fxAsync.run(
+                () -> movieFacade.search(kw, genreId, st, page, 10),
+                res -> {
+                    progress.setVisible(false);
+                    movieList.setAll(res.items());
+                    pagination.setPageCount(res.totalPages());
+                    lblTotal.setText("Tổng số: " + res.totalElements() + " phim");
+                },
+                ex -> {
+                    progress.setVisible(false);
+                    AlertUtil.showError(ex);
+                },
+                null
+        );
     }
 
     private void setupColumns() {
