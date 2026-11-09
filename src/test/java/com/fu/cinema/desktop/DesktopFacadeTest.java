@@ -34,4 +34,25 @@ class DesktopFacadeTest {
         assertNull(session.getUser());
         assertEquals("", session.displayNameProperty().get());
     }
+
+    @Test
+    void adminSessionPublishesDisplayNameAndClearsItAtLogout() {
+        var names = new java.util.ArrayList<String>();
+        javafx.beans.value.ChangeListener<String> listener = (observable, previous, name) -> names.add(name);
+        session.displayNameProperty().addListener(listener);
+        try {
+            var admin = auth.loginAdmin("admin", "Admin@123");
+            assertFalse(admin.getDisplayName().isBlank());
+            session.login(admin);
+
+            assertSame(admin, session.getUser());
+            assertDoesNotThrow(session::requireAdmin);
+            session.logout();
+
+            assertNull(session.getUser());
+            assertEquals(java.util.List.of(admin.getDisplayName(), ""), names);
+        } finally {
+            session.displayNameProperty().removeListener(listener);
+        }
+    }
 }
