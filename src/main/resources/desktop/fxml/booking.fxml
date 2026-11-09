@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fu.cinema.desktop.controller.BookingAdminController" fx:id="root" spacing="14">
+    <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+    <Label text="Quản lý đơn đặt vé" styleClass="page-title"/>
+    <FlowPane hgap="10" vgap="10">
+        <ComboBox fx:id="cbStatus" promptText="Tất cả trạng thái" prefWidth="160"/>
+        <DatePicker fx:id="dpFrom" promptText="Từ ngày đặt" prefWidth="145"/>
+        <DatePicker fx:id="dpTo" promptText="Đến ngày đặt" prefWidth="145"/>
+        <TextField fx:id="tfKeyword" promptText="Tên / email / số điện thoại" prefWidth="220"/>
+        <Button text="Tìm kiếm" onAction="#onSearch"/>
+        <Button text="Làm mới" onAction="#onRefresh"/>
+    </FlowPane>
+    <Label fx:id="lblError" wrapText="true" style="-fx-text-fill: #b91c1c;"/>
+    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" text="Mã đơn" prefWidth="70"/>
+            <TableColumn fx:id="colCustomer" text="Khách hàng" prefWidth="150"/>
+            <TableColumn fx:id="colMovie" text="Phim" prefWidth="175"/>
+            <TableColumn fx:id="colRoom" text="Phòng" prefWidth="90"/>
+            <TableColumn fx:id="colStart" text="Giờ chiếu" prefWidth="140"/>
+            <TableColumn fx:id="colSeats" text="Số vé" prefWidth="60"/>
+            <TableColumn fx:id="colTotal" text="Tổng tiền" prefWidth="120"/>
+            <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="110"/>
+            <TableColumn fx:id="colDate" text="Ngày đặt" prefWidth="140"/>
+        </columns>
+        <placeholder><Label text="Không có đơn phù hợp"/></placeholder>
+    </TableView>
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Button fx:id="btnConfirm" text="Xác nhận đơn" onAction="#onConfirm"/>
+        <Button fx:id="btnCancel" text="Huỷ đơn" onAction="#onCancel"/>
+        <ProgressIndicator fx:id="progress" prefWidth="24" prefHeight="24"/>
+        <Label fx:id="lblTotal"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Pagination fx:id="pagination" pageCount="1" maxPageIndicatorCount="5" prefWidth="280"/>
+    </HBox>
+</VBox>
