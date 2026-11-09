@@ -5,46 +5,45 @@ import com.fu.cinema.desktop.util.AlertUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
-import javafx.geometry.Pos;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
 public class SeatMapView extends VBox {
 
     private static final int MAX_SELECTION = 8;
 
     private static final PseudoClass SOLD = PseudoClass.getPseudoClass("sold");
-    private final GridPane seats = new GridPane();
     private final ObservableList<String> selectedSeats = FXCollections.observableArrayList();
     private final ObservableList<String> selectionView =
             FXCollections.unmodifiableObservableList(selectedSeats);
     private final Runnable onLimit;
+
+    @FXML
+    private GridPane seats;
 
     public SeatMapView() {
         this(() -> AlertUtil.warn("Mỗi đơn tối đa " + MAX_SELECTION + " ghế"));
     }
 
     SeatMapView(Runnable onLimit) {
-        super(12);
         this.onLimit = onLimit;
-        setAlignment(Pos.TOP_CENTER);
-        Label screen = new Label("MÀN HÌNH");
-        screen.getStyleClass().add("screen");
-        screen.setMaxWidth(Double.MAX_VALUE);
-        seats.setAlignment(Pos.CENTER);
-        seats.setHgap(5);
-        seats.setVgap(5);
-        HBox legend = new HBox(18,
-                legendItem("Ghế trống", "legend-free"),
-                legendItem("Ghế đang chọn", "legend-selected"),
-                legendItem("Ghế đã bán", "legend-sold"));
-        legend.setAlignment(Pos.CENTER);
-        getChildren().addAll(screen, seats, legend);
+        FXMLLoader loader = new FXMLLoader(SeatMapView.class.getResource("/desktop/fxml/seat-map.fxml"));
+        loader.setRoot(this);
+        loader.setController(this);
+        try {
+            loader.load();
+        } catch (IOException e) {
+            throw new UncheckedIOException("Không nạp được sơ đồ ghế", e);
+        }
     }
+
     public void setData(SeatMapData data) {
         seats.getChildren().clear();
         selectedSeats.clear();
@@ -72,6 +71,7 @@ public class SeatMapView extends VBox {
         seat.setOnAction(event -> updateSelection(seat, code));
         return seat;
     }
+
     private void updateSelection(ToggleButton seat, String code) {
         if (!seat.isSelected()) {
             selectedSeats.remove(code);
@@ -83,11 +83,4 @@ public class SeatMapView extends VBox {
         }
     }
 
-    private HBox legendItem(String label, String style) {
-        Region swatch = new Region();
-        swatch.getStyleClass().addAll("legend-swatch", style);
-        HBox item = new HBox(5, swatch, new Label(label));
-        item.setAlignment(Pos.CENTER_LEFT);
-        return item;
-    }
 }

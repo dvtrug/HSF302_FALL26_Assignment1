@@ -1,8 +1,8 @@
 # Tích hợp sơ đồ ghế JavaFX
 
 Khai báo `SeatMapView` trong FXML của màn hình bán vé. Đặt component trong
-`ScrollPane` để cuộn khi sơ đồ lớn hơn vùng hiển thị. Stylesheet
-`desktop/css/desktop.css` đã được `SceneManager` nạp vào scene chính.
+`ScrollPane` để cuộn khi sơ đồ lớn hơn vùng hiển thị. Component nạp bố cục từ `seat-map.fxml` và stylesheet riêng
+`css/desktop-seat-map.css`.
 
 ```xml
 <?import com.fu.cinema.desktop.component.SeatMapView?>
