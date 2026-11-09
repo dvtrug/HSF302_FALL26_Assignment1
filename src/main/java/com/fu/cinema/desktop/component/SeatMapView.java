@@ -20,6 +20,8 @@ public class SeatMapView extends VBox {
     private static final PseudoClass SOLD = PseudoClass.getPseudoClass("sold");
     private final GridPane seats = new GridPane();
     private final ObservableList<String> selectedSeats = FXCollections.observableArrayList();
+    private final ObservableList<String> selectionView =
+            FXCollections.unmodifiableObservableList(selectedSeats);
     private final Runnable onLimit;
 
     public SeatMapView() {
@@ -54,6 +56,11 @@ public class SeatMapView extends VBox {
                 seats.add(createSeat(code, data.soldSeats().contains(code)), number, row);
             }
         }
+    }
+
+    /** Live, read-only seat codes in selection order. */
+    public ObservableList<String> getSelectedSeats() {
+        return selectionView;
     }
 
     private ToggleButton createSeat(String code, boolean sold) {
