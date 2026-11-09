@@ -1,0 +1,19 @@
+.counter-progress {
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+}
+
+.counter-controls {
+    -fx-padding: 12px;
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+}
+
+.counter-seats {
+    -fx-padding: 12px;
+}
+
+.counter-total {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
