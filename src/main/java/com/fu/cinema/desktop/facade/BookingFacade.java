@@ -31,4 +31,16 @@ public class BookingFacade {
                 booking.getTickets().stream().map(Ticket::getSeatCode).sorted().toList(),
                 booking.getTotalAmount(), booking.getStatus(), booking.getBookingDate());
     }
+
+    @Transactional
+    public void confirm(Long id) {
+        session.requireAdmin();
+        bookingService.confirm(id);
+    }
+
+    @Transactional
+    public void cancel(Long id) {
+        session.requireAdmin();
+        bookingService.cancelByAdmin(id);
+    }
 }
