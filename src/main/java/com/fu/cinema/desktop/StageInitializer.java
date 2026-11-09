@@ -1,24 +1,23 @@
 package com.fu.cinema.desktop;
 
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
+import com.fu.cinema.desktop.navigation.SceneManager;
+import com.fu.cinema.desktop.navigation.View;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Lắng nghe sự kiện StageReadyEvent để khởi tạo giao diện ứng dụng.
- * Ở TODO 33: khởi tạo placeholder scene; TODO 34 sẽ nạp qua SceneManager.
+ * Lắng nghe sự kiện StageReadyEvent để khởi tạo cửa sổ chính qua SceneManager.
  */
 @Component
+@RequiredArgsConstructor
 public class StageInitializer implements ApplicationListener<StageReadyEvent> {
+
+    private final SceneManager sceneManager;
 
     @Override
     public void onApplicationEvent(StageReadyEvent event) {
-        Stage stage = event.getStage();
-        stage.setTitle("FU Cinema — Desktop");
-        stage.setScene(new Scene(new StackPane(new Label("FU Cinema Desktop — Quầy vé")), 800, 600));
-        stage.show();
+        sceneManager.init(event.getStage());
+        sceneManager.switchTo(View.MAIN);
     }
 }
