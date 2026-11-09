@@ -94,7 +94,7 @@ public class CounterSaleController {
         progress.visibleProperty().bind(reads.greaterThan(0).or(selling));
         progress.managedProperty().bind(progress.visibleProperty());
         sellButton.disableProperty().bind(customer.isNull().or(showtime.valueProperty().isNull())
-                .or(seatsReady.not()).or(count.isEqualTo(0)));
+                .or(seatsReady.not()).or(count.isEqualTo(0)).or(selling));
         total.textProperty().bind(Bindings.createStringBinding(() -> {
             ShowtimeItem selected = showtime.getValue();
             BigDecimal amount = selected == null || !seatsReady.get() ? BigDecimal.ZERO
@@ -176,13 +176,21 @@ public class CounterSaleController {
         }
         boolean paidNow = paid.isSelected();
         selling.set(true);
+        String confirmation = "Bán vé cho " + customer.fullName() + "?\nGhế: " + String.join(", ", selectedSeats)
+                + "\nTổng tiền: " + MoneyUtil.format(selected.price().multiply(BigDecimal.valueOf(selectedSeats.size())))
+                + "\nTrạng thái: " + (paidNow ? "CONFIRMED (đã thanh toán)" : "PENDING (chưa thanh toán)");
+        if (!AlertUtil.confirm(confirmation) || root.getScene() == null) {
+            selling.set(false);
+            return;
+        }
         status.setText("Đang tạo đơn…");
         async.run(() -> sales.sell(customer.id(), selected.id(), selectedSeats, paidNow), result -> {
             if (root.getScene() != null) {
                 paid.setSelected(false);
                 status.setText("Đã tạo đơn #" + result.bookingId() + " · " + result.status());
                 loadSeats(selected);
-                AlertUtil.info(status.getText() + " · " + MoneyUtil.format(result.total()));
+                AlertUtil.info(status.getText() + "\nGhế: " + String.join(", ", result.seats())
+                        + "\nTổng tiền: " + MoneyUtil.format(result.total()));
             }
             selling.set(false);
         }, error -> {

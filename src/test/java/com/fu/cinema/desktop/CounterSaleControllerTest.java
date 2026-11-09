@@ -11,11 +11,13 @@ import com.fu.cinema.dto.SessionUser;
 import com.fu.cinema.enums.BookingStatus;
 import com.fu.cinema.enums.Role;
 import com.fu.cinema.service.BookingService;
+import com.fu.cinema.repository.BookingRepository;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
@@ -47,6 +49,7 @@ class CounterSaleControllerTest {
     @Autowired ApplicationContext context;
     @Autowired DesktopSession session;
     @Autowired BookingService bookings;
+    @Autowired BookingRepository bookingRepository;
 
     @BeforeAll
     static void startJavaFx() {
@@ -118,9 +121,15 @@ class CounterSaleControllerTest {
             assertTrue(total.getText().contains("80.000"));
             ((CheckBox) view.getNamespace().get("paid")).setSelected(true);
             assertFalse(sell.isDisabled());
-            sell.fire();
             return null;
         });
+        long before = bookingRepository.count();
+        Platform.runLater(sell::fire);
+        answerDialog(stage, "A1", ButtonType.NO);
+        assertEquals(before, bookingRepository.count(), "Declining must not write a booking");
+        assertFalse(onFx(sell::isDisabled));
+        Platform.runLater(sell::fire);
+        answerDialog(stage, "80.000", ButtonType.YES);
         closeDialog(stage, "CONFIRMED");
         awaitFx(() -> map.isVisible() && seat(map, "A1").isDisabled());
 
@@ -133,9 +142,10 @@ class CounterSaleControllerTest {
         onFx(() -> {
             seat(map, "A2").fire();
             assertFalse(sell.isDisabled());
-            sell.fire();
             return null;
         });
+        Platform.runLater(sell::fire);
+        answerDialog(stage, "A2", ButtonType.YES);
         closeDialog(stage, "Ghế đã có người đặt");
         awaitFx(() -> map.isVisible() && seat(map, "A2").isDisabled());
         assertTrue(onFx(sell::isDisabled));
@@ -147,6 +157,10 @@ class CounterSaleControllerTest {
     }
 
     private static void closeDialog(Stage stage, String expected) throws Exception {
+        answerDialog(stage, expected, ButtonType.OK);
+    }
+
+    private static void answerDialog(Stage stage, String expected, ButtonType answer) throws Exception {
         awaitFx(() -> Window.getWindows().stream().anyMatch(window ->
                 window != stage && window.isShowing() && window.getScene().getRoot() instanceof DialogPane));
         onFx(() -> {
@@ -155,7 +169,11 @@ class CounterSaleControllerTest {
                     .findFirst().orElseThrow();
             var pane = (DialogPane) window.getScene().getRoot();
             try {
-                assertTrue(pane.getContentText().contains(expected), pane.getContentText());
+                var content = ((javafx.scene.control.ScrollPane) pane.getContent()).getContent();
+                String text = ((Label) content).getText();
+                assertTrue(text.contains(expected), text);
+                assertNotNull(pane.lookupButton(answer), "Expected confirmation/notification button " + answer);
+                ((Button) pane.lookupButton(answer)).fire();
             } finally {
                 window.hide();
             }
