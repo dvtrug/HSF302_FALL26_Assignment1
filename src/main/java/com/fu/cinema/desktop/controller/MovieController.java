@@ -26,6 +26,7 @@ public class MovieController {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final javafx.css.PseudoClass STOPPED = javafx.css.PseudoClass.getPseudoClass("stopped");
+    private final javafx.animation.PauseTransition debounce = new javafx.animation.PauseTransition(javafx.util.Duration.millis(300));
     private final MovieFacade movieFacade;
     private final FxAsync fxAsync;
 
@@ -95,5 +96,11 @@ public class MovieController {
         tfKeyword.clear();
         cbGenre.setValue(null);
         cbStatus.setValue(null);
+    }
+    private void setupSearchDebounce() {
+        debounce.setOnFinished(e -> loadPage(0));
+        tfKeyword.textProperty().addListener((obs, oldVal, newVal) -> debounce.playFromStart());
+        cbGenre.valueProperty().addListener((obs, oldVal, newVal) -> loadPage(0));
+        cbStatus.valueProperty().addListener((obs, oldVal, newVal) -> loadPage(0));
     }
 }
