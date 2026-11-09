@@ -55,4 +55,14 @@ class DesktopFacadeTest {
             session.displayNameProperty().removeListener(listener);
         }
     }
+
+    @Test
+    void lockedAccountRemainsSignedOut() {
+        var error = assertThrows(BusinessException.class,
+                () -> session.login(auth.loginAdmin("locked_user", "123456")));
+
+        assertTrue(error.getMessage().contains("bị khóa"));
+        assertNull(session.getUser());
+        assertThrows(BusinessException.class, session::requireAdmin);
+    }
 }
