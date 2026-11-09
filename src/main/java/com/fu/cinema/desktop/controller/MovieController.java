@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 public class MovieController {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
+    private static final javafx.css.PseudoClass STOPPED = javafx.css.PseudoClass.getPseudoClass("stopped");
     private final MovieFacade movieFacade;
     private final FxAsync fxAsync;
 
@@ -72,6 +72,14 @@ public class MovieController {
         colStatus.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().status()));
 
         tableMovies.setItems(movieList);
+        tableMovies.setRowFactory(tv -> new TableRow<>() {
+            @Override
+            protected void updateItem(MovieRow item, boolean empty) {
+                super.updateItem(item, empty);
+                pseudoClassStateChanged(STOPPED, !empty && item != null && item.status() == MovieStatus.STOPPED);
+            }
+        });
+
     }
 
     private void loadFilters() {

@@ -129,6 +129,14 @@
     -fx-background-radius: 3;
 }
 
+/* Styling phim ngừng chiếu */
+.table-row-cell:stopped {
+    -fx-background-color: #f3f4f6;
+}
+.table-row-cell:stopped .table-cell {
+    -fx-text-fill: #9ca3af;
+}
+
 .legend-free { -fx-background-color: #e5e7eb; }
 .legend-selected { -fx-background-color: #16a34a; }
 .legend-sold { -fx-background-color: #6b7280; }
