@@ -35,7 +35,17 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Controller managing the showtime scheduling tab (showtime-tab.fxml).
+ * Controller managing the showtime scheduling tab ({@code showtime-tab.fxml}).
+ * <p>
+ * <b>Key Responsibilities:</b>
+ * <ul>
+ *   <li>Presents paged showtime schedules with multi-criteria filtering (Movie, Room, Date).</li>
+ *   <li>Dynamically calculates and binds suggested end times:
+ *       {@code EndTime = StartTime + MovieDuration + 15' room cleanup}.</li>
+ *   <li>Performs client-side validation using {@link FxValidator} before dispatching save requests.</li>
+ *   <li>Executes database operations asynchronously off the UI thread via {@link FxAsync}.</li>
+ *   <li>Handles schedule conflict notifications (BR-08) and cascading cancellation feedback (BR-09).</li>
+ * </ul>
  */
 @Component
 @Scope("prototype")

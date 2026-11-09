@@ -6,6 +6,7 @@ import com.fu.cinema.desktop.model.RoomItem;
 import com.fu.cinema.desktop.model.ShowtimeRow;
 import com.fu.cinema.desktop.session.DesktopSession;
 import com.fu.cinema.dto.ShowtimeForm;
+import com.fu.cinema.exception.BusinessException;
 import com.fu.cinema.service.MovieService;
 import com.fu.cinema.service.RoomService;
 import com.fu.cinema.service.ShowtimeService;
@@ -17,8 +18,28 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Facade bridging JavaFX Desktop controllers to the backend showtime, movie, and room services.
- * Enforces admin authorization via {@link DesktopSession#requireAdmin()} on write operations.
+ * Facade bridging the JavaFX Desktop client to showtime management, movie scheduling, and room querying services.
+ * <p>
+ * <b>Architectural and Business Rules:</b>
+ * <ul>
+ *   <li><b>BR-D1 (Authorization):</b> All mutating operations ({@link #save(ShowtimeForm)}, {@link #delete(Long)})
+ *       strictly enforce administrator privileges via {@link DesktopSession#requireAdmin()}. Non-admin sessions
+ *       are rejected with a {@link BusinessException}.</li>
+ *   <li><b>BR-07 (Schedulable Movies):</b> Only active movies (status {@code SHOWING} or {@code UPCOMING}) can be scheduled.
+ *       Movies marked as {@code STOPPED} are filtered out via {@link #schedulableMovies()}.</li>
+ *   <li><b>BR-08 (Schedule Overlap Conflict Prevention):</b> Two showtimes in the same room cannot overlap in time.
+ *       The required showtime span is {@code [StartTime, EndTime]}, where {@code EndTime = StartTime + MovieDuration + 15 minutes}
+ *       buffer for cinema hall cleaning. If any overlap occurs, the backend service raises a {@link BusinessException}.</li>
+ *   <li><b>BR-09 (Safe Showtime Cleanup and Cancellation):</b>
+ *       When deleting a showtime via {@link #delete(Long)}:
+ *       <ul>
+ *         <li>If the showtime has no booked tickets/orders, it is permanently purged from the database (returns {@code true}).</li>
+ *         <li>If bookings already exist, the showtime cannot be deleted physically. Instead, its status transitions to
+ *             {@code CANCELLED}, and all associated bookings/tickets are automatically cancelled/refunded to preserve
+ *             audit trails and referential integrity (returns {@code false}).</li>
+ *       </ul>
+ *   </li>
+ * </ul>
  */
 @Service
 @Transactional(readOnly = true)
@@ -31,13 +52,13 @@ public class ShowtimeFacade {
     private final DesktopSession session;
 
     /**
-     * Searches showtimes with filter criteria and returns a paged result.
+     * Searches showtimes with optional filtering criteria (movie, room, date) and pagination.
      *
-     * @param movieId optional movie filter ID
-     * @param roomId optional room filter ID
-     * @param date optional show date filter
+     * @param movieId optional movie filter ID (null indicates all movies)
+     * @param roomId optional room filter ID (null indicates all rooms)
+     * @param date optional screening date filter (null indicates all dates)
      * @param page zero-based page index
-     * @return paged list of {@link ShowtimeRow}
+     * @return a {@link PageResult} containing immutable {@link ShowtimeRow} records and pagination metadata
      */
     public PageResult<ShowtimeRow> search(Long movieId, Long roomId, LocalDate date, int page) {
         return PageResult.of(showtimeService.search(movieId, roomId, date, page, 10), s -> new ShowtimeRow(
@@ -52,9 +73,10 @@ public class ShowtimeFacade {
     }
 
     /**
-     * Retrieves schedulable movies (excludes STOPPED status movies per BR-07).
+     * Retrieves all movies eligible for scheduling according to rule BR-07.
+     * Excludes movies marked as {@code STOPPED}.
      *
-     * @return list of {@link MovieItem} available for scheduling
+     * @return list of {@link MovieItem} records with ID, title, duration, and age rating
      */
     public List<MovieItem> schedulableMovies() {
         return movieService.findSchedulable().stream()
@@ -63,9 +85,10 @@ public class ShowtimeFacade {
     }
 
     /**
-     * Retrieves active cinema rooms (excludes MAINTENANCE status rooms).
+     * Retrieves all cinema rooms currently available for scheduling.
+     * Excludes rooms marked as {@code MAINTENANCE}.
      *
-     * @return list of {@link RoomItem} available for scheduling
+     * @return list of {@link RoomItem} records representing active rooms
      */
     public List<RoomItem> activeRooms() {
         return roomService.findActive().stream()
@@ -74,19 +97,23 @@ public class ShowtimeFacade {
     }
 
     /**
-     * Loads the form data for a given showtime ID.
+     * Loads the form data for a given showtime ID to support editing in the desktop UI.
      *
-     * @param id the showtime ID
-     * @return the {@link ShowtimeForm}
+     * @param id the unique showtime identifier
+     * @return the {@link ShowtimeForm} containing existing showtime parameters
      */
     public ShowtimeForm getForm(Long id) {
         return showtimeService.getForm(id);
     }
 
     /**
-     * Saves a showtime (creates or updates) after verifying admin permissions.
+     * Saves a showtime (creates a new schedule entry or updates an existing one).
+     * <p>
+     * Enforces administrator authorization (BR-D1) and verifies that no schedule overlap
+     * occurs within the same cinema room (BR-08).
      *
-     * @param form the showtime form data
+     * @param form the showtime form data to persist
+     * @throws BusinessException if unauthorized or if a schedule overlap is detected
      */
     @Transactional
     public void save(ShowtimeForm form) {
@@ -99,10 +126,14 @@ public class ShowtimeFacade {
     }
 
     /**
-     * Deletes or cancels a showtime after verifying admin permissions.
+     * Deletes or cancels a showtime according to safe cleanup rule BR-09.
+     * <p>
+     * Enforces administrator authorization (BR-D1). If tickets have been sold, the showtime
+     * status transitions to {@code CANCELLED} and existing orders are cancelled.
      *
-     * @param id the showtime ID
-     * @return true if permanently deleted, false if cancelled with orders refunded/cancelled (BR-09)
+     * @param id the unique showtime identifier
+     * @return {@code true} if permanently deleted (no tickets sold), {@code false} if cancelled with orders refunded (BR-09)
+     * @throws BusinessException if unauthorized
      */
     @Transactional
     public boolean delete(Long id) {
