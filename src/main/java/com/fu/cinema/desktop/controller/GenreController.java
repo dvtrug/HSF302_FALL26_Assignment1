@@ -99,8 +99,19 @@ public class GenreController {
 
     @FXML
     public void onReload() {
-        genres.clear();
-        genres.addAll(genreFacade.findAll());
+        progress.setVisible(true);
+        fxAsync.run(
+                genreFacade::findAll,
+                list -> {
+                    progress.setVisible(false);
+                    genres.setAll(list);
+                },
+                ex -> {
+                    progress.setVisible(false);
+                    AlertUtil.showError(ex);
+                },
+                null
+        );
     }
 
     @FXML
@@ -114,11 +125,57 @@ public class GenreController {
 
     @FXML
     public void onSaveGenre() {
-        // Sẽ hoàn thiện ở commit tiếp theo
+        GenreForm form = buildForm();
+        if (!validateForm(form)) {
+            return;
+        }
+        progress.setVisible(true);
+        fxAsync.run(
+                () -> {
+                    genreFacade.save(form);
+                    return true;
+                },
+                success -> {
+                    progress.setVisible(false);
+                    AlertUtil.info(selectedGenreId == null ? "Thêm thể loại thành công!" : "Cập nhật thể loại thành công!");
+                    onClearForm();
+                    onReload();
+                },
+                ex -> {
+                    progress.setVisible(false);
+                    AlertUtil.showError(ex);
+                },
+                btnSave
+        );
     }
 
     @FXML
     public void onDeleteGenre() {
-        // Sẽ hoàn thiện ở commit tiếp theo
+        if (selectedGenreId == null) {
+            return;
+        }
+        boolean confirm = AlertUtil.confirm("Bạn có chắc chắn muốn xoá thể loại đang chọn?");
+        if (!confirm) {
+            return;
+        }
+        progress.setVisible(true);
+        Long idToDelete = selectedGenreId;
+        fxAsync.run(
+                () -> {
+                    genreFacade.delete(idToDelete);
+                    return true;
+                },
+                success -> {
+                    progress.setVisible(false);
+                    AlertUtil.info("Đã xoá thể loại thành công!");
+                    onClearForm();
+                    onReload();
+                },
+                ex -> {
+                    progress.setVisible(false);
+                    AlertUtil.showError(ex);
+                },
+                btnDelete
+        );
     }
 }
