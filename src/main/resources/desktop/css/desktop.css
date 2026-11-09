@@ -128,6 +128,28 @@
     -fx-min-height: 16;
     -fx-background-radius: 3;
 }
+/* === Genre Management Styles === */
+.genre-form-pane {
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 0 0 0 1;
+}
+
+.button-danger {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 6;
+}
+
+.button-danger:hover {
+    -fx-background-color: #dc2626;
+}
+
+.button-danger:disabled {
+    -fx-opacity: 0.4;
+}
 
 .legend-free { -fx-background-color: #e5e7eb; }
 .legend-selected { -fx-background-color: #16a34a; }
