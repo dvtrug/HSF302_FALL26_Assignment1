@@ -13,10 +13,10 @@
 
 | Mã | Issue | Tiêu đề Issue | Người làm | Người review | Milestone | Nhánh Git | Trạng thái |
 |:---:|:---:|---|:---:|:---:|---|---|:---:|
-| **D1** | [#44](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/44) | `[FEATURE] JavaFX bootstrap & desktop profile (TODO 33)` | **A (Leader)** | C | Sprint 4 | `feature/44-desktop-bootstrap` | 🟡 In Progress |
-| **D2** | [#45](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/45) | `[FEATURE] Desktop navigation & main layout (TODO 34)` | **A (Leader)** | B | Sprint 4 | `feature/45-desktop-navigation` | ⚪ Todo |
-| **D3** | [#46](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/46) | `[FEATURE] Desktop shared utilities (TODO 35)` | **B** | E | Sprint 4 | `feature/46-desktop-utilities` | ⚪ Todo |
-| **D4** | [#47](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/47) | `[FEATURE] Desktop login & DesktopSession (TODO 36)` | **A (Leader)** | D | Sprint 4 | `feature/47-desktop-login` | ⚪ Todo |
+| **D1** | [#44](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/44) | `[FEATURE] JavaFX bootstrap & desktop profile (TODO 33)` | **A (Leader)** | C | Sprint 4 | `feature/44-desktop-bootstrap` | 🟢 Closed (PR #59) |
+| **D2** | [#45](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/45) | `[FEATURE] Desktop navigation & main layout (TODO 34)` | **A (Leader)** | B | Sprint 4 | `feature/45-desktop-navigation` | 🟢 Closed (PR #60) |
+| **D3** | [#46](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/46) | `[FEATURE] Desktop shared utilities (TODO 35)` | **B** | E | Sprint 4 | `feature/46-desktop-utilities` | 🟢 Closed (PR #61) |
+| **D4** | [#47](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/47) | `[FEATURE] Desktop login & DesktopSession (TODO 36)` | **A (Leader)** | D | Sprint 4 | `feature/47-desktop-login` | 🟢 Closed (PR #62) |
 | **D5** | [#48](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/48) | `[FEATURE] Desktop dashboard with charts (TODO 37)` | **D** | A | Sprint 4 | `feature/48-desktop-dashboard` | ⚪ Todo |
 | **D6** | [#49](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/49) | `[FEATURE] Desktop genre management (TODO 38)` | **C** | B | Sprint 4 | `feature/49-desktop-genre` | ⚪ Todo |
 | **D7** | [#50](https://github.com/dvtrug/HSF302_FALL26_Assignment1/issues/50) | `[FEATURE] Desktop movie list, filter & pagination (TODO 39)` | **C** | E | Sprint 4 | `feature/50-desktop-movie-list` | ⚪ Todo |
@@ -33,19 +33,10 @@
 
 ## 👥 Ma Trận Phân Bổ Khối Lượng Công Việc
 
-| Thành viên | Phụ trách chính | 3 Issues Tác giả | 3 Lượt Review chéo | Commits dự kiến |
-|:---:|---|:---:|:---:|:---:|
-| **A (Leader)** | Nền tảng JavaFX, Khung Layout, Đăng nhập & Phân quyền | **#44, #45, #47** | **#48** (D), **#53** (D), **#58** (E) | **9 – 12** |
-| **B** | Tiện ích FxAsync/Validator, Quầy Bán Vé, Quản trị Đơn vé | **#46, #55, #56** | **#45** (A), **#49** (C), **#57** (E) | **9 – 12** |
-| **C** | Quản lý Thể loại, Danh sách Phim, Dialog Phim | **#49, #50, #51** | **#44** (A), **#52** (D), **#56** (B) | **9 – 12** |
-| **D** | Dashboard thống kê, CRUD Phòng chiếu, Lập lịch Suất chiếu | **#48, #52, #53** | **#47** (A), **#51** (C), **#54** (E) | **9 – 12** |
-| **E** | Sơ đồ ghế động SeatMapView, Báo cáo Doanh thu & CSV, Kiểm thử & Release | **#54, #57, #58** | **#46** (B), **#50** (C), **#55** (B) | **9 – 12** |
-
----
-
-## 🛠️ Quy Định Commit Cho Mỗi Issue (3 Commits/Issue)
-
-Mỗi issue thực hiện đúng 3 commit để bảo đảm chỉ số commit của cả 5 thành viên cân bằng trên GitHub Insights:
-1. `feat(desktop): add [Entity]Facade and records for [feature] Refs #<n>`
-2. `feat(desktop): create [feature].fxml and controller binding Refs #<n>`
-3. `feat(desktop): wire async handling and validation for [feature] Refs #<n>`
+| Thành viên | Phụ trách chính | 3 Issues Tác giả | 3 Lượt Review chéo | Commits hiện tại | Tiến độ |
+|:---:|---|:---:|:---:|:---:|:---:|
+| **A (Leader)** | Nền tảng JavaFX, Khung Layout, Đăng nhập & Phân quyền | **#44, #45, #47** | **#48** (D), **#53** (D), **#58** (E) | **6 commits** | 100% Sprint 4 (3/3 closed) |
+| **B** | Tiện ích FxAsync/Validator, Quầy Bán Vé, Quản trị Đơn vé | **#46, #55, #56** | **#45** (A), **#49** (C), **#57** (E) | **3 commits** | 1/3 closed (#46 done) |
+| **C** | Quản lý Thể loại, Danh sách Phim, Dialog Phim | **#49, #50, #51** | **#44** (A), **#52** (D), **#56** (B) | 0 commits | Chuẩn bị làm #49, #50 |
+| **D** | Dashboard thống kê, CRUD Phòng chiếu, Lập lịch Suất chiếu | **#48, #52, #53** | **#47** (A), **#51** (C), **#54** (E) | 0 commits | Chuẩn bị làm #48 |
+| **E** | Sơ đồ ghế động SeatMapView, Báo cáo Doanh thu & CSV, Kiểm thử & Release | **#54, #57, #58** | **#46** (B), **#50** (C), **#55** (B) | 0 commits | Sẵn sàng Sprint 5 |
