@@ -2,8 +2,10 @@ package com.fu.cinema.desktop.controller;
 
 import com.fu.cinema.desktop.facade.RoomFacade;
 import com.fu.cinema.desktop.model.RoomRow;
+import com.fu.cinema.desktop.util.AlertUtil;
 import com.fu.cinema.desktop.util.FxAsync;
 import com.fu.cinema.desktop.util.FxValidator;
+import com.fu.cinema.dto.RoomForm;
 import com.fu.cinema.enums.RoomStatus;
 import com.fu.cinema.enums.RoomType;
 import javafx.beans.binding.Bindings;
@@ -18,6 +20,8 @@ import javafx.scene.layout.VBox;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 @Scope("prototype")
@@ -101,6 +105,9 @@ public class RoomController {
         spRows.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 26, 10));
         spSeatsPerRow.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, 12));
 
+        spRows.focusedProperty().addListener((o, was, is) -> { if (!is) commitSpinners(); });
+        spSeatsPerRow.focusedProperty().addListener((o, was, is) -> { if (!is) commitSpinners(); });
+
         // Tự động tính sức chứa qua Binding
         lblCalculatedCapacity.textProperty().bind(Bindings.createStringBinding(
                 () -> {
@@ -114,11 +121,12 @@ public class RoomController {
         // Lắng nghe chọn dòng trên bảng để đổ dữ liệu vào form
         tableRooms.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, row) -> fill(row));
 
-        // Binding bật/tắt nút hành động
+        // Binding bật/tắt nút hành động (không truyền nút đã bind vào busy của FxAsync)
         btnDelete.disableProperty().bind(tableRooms.getSelectionModel().selectedItemProperty().isNull());
         btnSave.disableProperty().bind(tfName.textProperty().isEmpty());
 
         onNew();
+        reload();
     }
 
     private void fill(RoomRow row) {
@@ -149,13 +157,80 @@ public class RoomController {
 
     @FXML
     public void reload() {
+        fxAsync.run(facade::findAll, list -> {
+            rows.setAll(list);
+            lblRoomCount.setText(list.size() + " phòng");
+        }, btnRefresh);
     }
 
     @FXML
     public void onSave() {
+        commitSpinners();
+
+        RoomForm form = new RoomForm();
+        form.setRoomId(editingId);
+        form.setRoomName(tfName.getText() != null ? tfName.getText().trim() : "");
+        form.setRoomType(cbType.getValue());
+        form.setTotalRows(spRows.getValue());
+        form.setSeatsPerRow(spSeatsPerRow.getValue());
+        form.setStatus(cbStatus.getValue());
+
+        // Validate Bean Validation trên Form DTO
+        Map<String, String> errors = validator.validate(form);
+        if (!validator.mark(errors, Map.of(
+                "roomName", tfName,
+                "roomType", cbType,
+                "totalRows", spRows,
+                "seatsPerRow", spSeatsPerRow,
+                "status", cbStatus))) {
+            return;
+        }
+
+        fxAsync.runVoid(
+                () -> facade.save(form),
+                () -> {
+                    AlertUtil.info("Đã lưu phòng chiếu \"" + form.getRoomName() + "\" thành công!");
+                    onNew();
+                    reload();
+                },
+                formBox
+        );
     }
 
     @FXML
     public void onDelete() {
+        RoomRow selected = tableRooms.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+
+        if (!AlertUtil.confirm("Bạn có chắc chắn muốn xoá phòng chiếu \"" + selected.name() + "\"?")) {
+            return;
+        }
+
+        fxAsync.run(
+                () -> facade.delete(selected.id()),
+                deleted -> {
+                    if (deleted) {
+                        AlertUtil.info("Đã xoá phòng chiếu \"" + selected.name() + "\"!");
+                    } else {
+                        AlertUtil.warn("Phòng chiếu đã có suất chiếu → Đã chuyển trạng thái sang BẢO TRÌ (MAINTENANCE) theo quy định an toàn BR-06.");
+                    }
+                    onNew();
+                    reload();
+                },
+                formBox
+        );
+    }
+
+    private void commitSpinners() {
+        try {
+            if (spRows.getEditor().getText() != null && !spRows.getEditor().getText().isBlank()) {
+                spRows.getValueFactory().setValue(Integer.parseInt(spRows.getEditor().getText().trim()));
+            }
+        } catch (NumberFormatException ignored) {}
+        try {
+            if (spSeatsPerRow.getEditor().getText() != null && !spSeatsPerRow.getEditor().getText().isBlank()) {
+                spSeatsPerRow.getValueFactory().setValue(Integer.parseInt(spSeatsPerRow.getEditor().getText().trim()));
+            }
+        } catch (NumberFormatException ignored) {}
     }
 }
