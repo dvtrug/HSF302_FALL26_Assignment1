@@ -43,6 +43,14 @@ public class BookingAdminController {
         cbStatus.getItems().addAll(BookingStatus.values());
         progress.visibleProperty().bind(busy);
         progress.managedProperty().bind(busy);
+        colStatus.setCellFactory(column -> new TableCell<>() {
+            @Override protected void updateItem(BookingStatus value, boolean empty) {
+                super.updateItem(value, empty);
+                getStyleClass().removeAll("st-pending", "st-confirmed", "st-cancelled");
+                setText(empty || value == null ? null : value.name());
+                if (!empty && value != null) getStyleClass().add("st-" + value.name().toLowerCase(java.util.Locale.ROOT));
+            }
+        });
     }
     @FXML private void onSearch() { }
     @FXML private void onRefresh() { }

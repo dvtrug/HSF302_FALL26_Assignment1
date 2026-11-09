@@ -14,7 +14,7 @@
         <Button text="Làm mới" onAction="#onRefresh"/>
     </FlowPane>
     <Label fx:id="lblError" wrapText="true" style="-fx-text-fill: #b91c1c;"/>
-    <TableView fx:id="table" VBox.vgrow="ALWAYS" placeholder="">
+    <TableView fx:id="table" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="colId" text="Mã đơn" prefWidth="70"/>
             <TableColumn fx:id="colCustomer" text="Khách hàng" prefWidth="150"/>
