@@ -23,8 +23,12 @@ trên Windows có giao diện hoặc Linux qua `xvfb-run`.
   rollback và hai transaction trên H2 tranh cùng một ghế.
 - `CounterSaleControllerTest` chạy FXML với H2, xác nhận tổng tiền và đơn
   CONFIRMED. Sau khi luồng service của web mua ghế tiếp theo, quầy báo lỗi và
-  cập nhật ghế đã bán. Chạy lại TC-D16 trên web và desktop cùng SQL Server
-  khi nghiệm thu bản tích hợp.
+  cập nhật ghế đã bán.
+- Kiểm thử bổ sung với SQL Express 17.0 dùng CSDL QA riêng. MockMvc gọi
+  endpoint đặt vé web đồng thời với thao tác JavaFX. Một bên thành công,
+  bên còn lại nhận lỗi ghế đã bán. Sơ đồ cập nhật. Lượt kiểm thử này
+  dùng bản SQL Express cục bộ, cần chạy lại trên SQL Server 2019/2022
+  khi nghiệm thu môi trường nộp.
 - [Ảnh giao diện quầy vé](../screenshots/desktop/counter-sale.png).
 
 PR #65 phụ thuộc tiện ích #63 và sơ đồ ghế #66. Sau khi các dependency vào
