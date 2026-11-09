@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 @Scope("prototype")
 @RequiredArgsConstructor
@@ -98,5 +100,22 @@ public class MovieDialogController {
         form.setPosterUrl(tfPosterUrl.getText() != null ? tfPosterUrl.getText().trim() : "");
         form.setDescription(taDescription.getText() != null ? taDescription.getText().trim() : "");
         return form;
+    }
+
+    public boolean validate() {
+        MovieForm form = buildForm();
+        Map<String, String> errors = fxValidator.validate(form);
+        Map<String, Control> fields = Map.of(
+                "title", tfTitle,
+                "director", tfDirector,
+                "duration", spDuration,
+                "releaseDate", dpReleaseDate,
+                "ageRating", cbAgeRating,
+                "status", cbStatus,
+                "genreId", cbGenre,
+                "posterUrl", tfPosterUrl,
+                "description", taDescription
+        );
+        return fxValidator.mark(errors, fields);
     }
 }
