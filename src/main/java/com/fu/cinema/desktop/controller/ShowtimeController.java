@@ -1,12 +1,15 @@
 package com.fu.cinema.desktop.controller;
 
-import com.fu.cinema.desktop.util.FxAsync;
 import com.fu.cinema.desktop.facade.ShowtimeFacade;
 import com.fu.cinema.desktop.model.MovieItem;
+import com.fu.cinema.desktop.model.PageResult;
 import com.fu.cinema.desktop.model.RoomItem;
 import com.fu.cinema.desktop.model.ShowtimeRow;
 import com.fu.cinema.desktop.session.DesktopSession;
+import com.fu.cinema.desktop.util.AlertUtil;
+import com.fu.cinema.desktop.util.FxAsync;
 import com.fu.cinema.desktop.util.FxValidator;
+import com.fu.cinema.dto.ShowtimeForm;
 import com.fu.cinema.enums.ShowtimeStatus;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
@@ -29,6 +32,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Controller managing the showtime scheduling tab (showtime-tab.fxml).
@@ -364,16 +368,77 @@ public class ShowtimeController {
         spHour.getValueFactory().setValue(19);
         spMinute.getValueFactory().setValue(0);
         tfPrice.clear();
+        validator.mark(Map.of(), Map.of(
+                "movieId", cbMovie,
+                "roomId", cbRoom,
+                "startTime", dpDate,
+                "ticketPrice", tfPrice
+        ));
     }
 
+    /**
+     * Xóa hoặc hủy suất chiếu theo quy tắc an toàn BR-09.
+     */
     @FXML
     public void onDelete() {
-        // Will be wired in commit 7
+        ShowtimeRow selected = tableShowtimes.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+
+        if (!AlertUtil.confirm("Bạn có chắc chắn muốn xoá suất chiếu #" + selected.id() + " của phim \"" + selected.movieTitle() + "\"?")) {
+            return;
+        }
+
+        fxAsync.run(
+                () -> facade.delete(selected.id()),
+                deleted -> {
+                    if (deleted) {
+                        AlertUtil.info("Đã xoá vĩnh viễn suất chiếu #" + selected.id() + "!");
+                    } else {
+                        AlertUtil.warn("Suất chiếu đã có vé đặt → Đã huỷ suất chiếu và huỷ các đơn vé liên quan theo quy định BR-09.");
+                    }
+                    onNew();
+                    loadPage(currentPage);
+                },
+                formBox
+        );
     }
 
+    /**
+     * Lưu suất chiếu (thêm mới hoặc cập nhật) với kiểm tra trùng lịch BR-08 và tính giờ kết thúc.
+     */
     @FXML
     public void onSave() {
-        // Will be wired in commit 7
+        // Đồng bộ giá trị spinner nếu người dùng gõ tay
+        spHour.commitValue();
+        spMinute.commitValue();
+
+        ShowtimeForm form = new ShowtimeForm();
+        form.setShowtimeId(editingId);
+        form.setMovieId(cbMovie.getValue() == null ? null : cbMovie.getValue().id());
+        form.setRoomId(cbRoom.getValue() == null ? null : cbRoom.getValue().id());
+        form.setStartTime(startTime());
+        form.setEndTime(suggestedEnd());
+        form.setTicketPrice(tfPrice.getText() == null || tfPrice.getText().isBlank() ? null : new BigDecimal(tfPrice.getText().trim()));
+        form.setStatus(ShowtimeStatus.OPEN);
+
+        Map<String, String> errors = validator.validate(form);
+        if (!validator.mark(errors, Map.of(
+                "movieId", cbMovie,
+                "roomId", cbRoom,
+                "startTime", dpDate,
+                "ticketPrice", tfPrice))) {
+            return;
+        }
+
+        fxAsync.runVoid(
+                () -> facade.save(form),
+                () -> {
+                    AlertUtil.info("Đã lưu suất chiếu thành công!");
+                    onNew();
+                    loadPage(currentPage);
+                },
+                formBox
+        );
     }
 
     public LocalDateTime startTime() {
