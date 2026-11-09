@@ -183,7 +183,27 @@ public class MovieController {
     }
 
     private void onDeleteMovie(MovieRow row) {
-        // Sẽ hoàn thiện ở commit 6
+        boolean confirm = AlertUtil.confirm("Bạn có chắc chắn muốn xoá phim: \"" + row.title() + "\"?");
+        if (!confirm) return;
+
+        progress.setVisible(true);
+        fxAsync.run(
+                () -> movieFacade.delete(row.movieId()),
+                hardDeleted -> {
+                    progress.setVisible(false);
+                    if (hardDeleted) {
+                        AlertUtil.info("Đã xoá hoàn toàn phim \"" + row.title() + "\"!");
+                    } else {
+                        AlertUtil.warn("Phim đã có suất chiếu liên kết nên không thể xoá hẳn. Đã chuyển trạng thái sang NGỪNG CHIẾU (BR-06).");
+                    }
+                    loadPage(pagination.getCurrentPageIndex());
+                },
+                ex -> {
+                    progress.setVisible(false);
+                    AlertUtil.showError(ex);
+                },
+                null
+        );
     }
 
     private void loadFilters() {
