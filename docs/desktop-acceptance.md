@@ -26,4 +26,9 @@ Kết quả bên dưới phân biệt test tự động và thao tác thủ côn
 | TC-D17 | #56 | Lọc và mở chi tiết đơn web. Xác nhận PENDING, hủy PENDING/CONFIRMED và kiểm tra nút bị khóa khi CANCELLED. | Web có test chuyển trạng thái trong `BookingAdminIntegrationTest`. Chờ nghiệm thu tích hợp #56. |
 | TC-D18 | #57 | Đối chiếu số liệu doanh thu với web và kiểm tra khoảng ngày đảo ngược bị từ chối. | Đạt bằng test facade trên H2. |
 | TC-D19 | #57 | Chọn kỳ không có đơn, kiểm tra thông báo và nút Xuất CSV bị khóa. | Đạt bằng test facade và chạy thử giao diện JavaFX trên H2. |
-| TC-D20 | #57 | Xuất CSV có tên phim và tên khách tiếng Việt, kiểm tra UTF-8 BOM rồi mở Excel để kiểm tra hiển thị. | Đạt kiểm tra byte và nội dung CSV. Chờ mở trong Excel. |
+| TC-D20 | #57 | Xuất CSV có tên phim và tên khách tiếng Việt, kiểm tra UTF-8 BOM rồi mở Excel để kiểm tra hiển thị. | Đạt kiểm tra byte và nhập vào Excel theo UTF-8, dấu phẩy. Excel giữ đúng tên tiếng Việt và giá trị tiền. Mở trực tiếp có thể dồn dữ liệu vào một cột tùy vùng. |
+
+Bản tích hợp ba nhánh của E chạy clean verify: **100 test đạt**, 0 lỗi,
+0 bỏ qua trên Windows. Dùng Mockito agent nạp sẵn để tránh cơ chế tự attach
+trong sandbox. Đây là kết quả của ba nhánh E trên nền develop, trước khi
+tích hợp các tính năng desktop còn lại.
