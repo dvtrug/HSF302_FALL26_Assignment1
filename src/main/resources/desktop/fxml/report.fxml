@@ -19,8 +19,8 @@
         <DatePicker fx:id="fromDate" editable="false" prefWidth="140"/>
         <Label text="Đến ngày"/>
         <DatePicker fx:id="toDate" editable="false" prefWidth="140"/>
-        <Button text="Xem báo cáo" styleClass="primary"/>
-        <Button fx:id="exportButton" text="Xuất CSV" disable="true"/>
+        <Button text="Xem báo cáo" onAction="#onGenerate" styleClass="primary"/>
+        <Button fx:id="exportButton" text="Xuất CSV" onAction="#onExport" disable="true"/>
     </HBox>
     <Label fx:id="status" text="Chọn khoảng ngày để xem báo cáo." wrapText="true"/>
     <HBox spacing="12">
