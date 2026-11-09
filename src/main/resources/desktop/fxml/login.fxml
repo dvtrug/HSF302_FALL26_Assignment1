@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane styleClass="main" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.fu.cinema.desktop.controller.LoginController">
+    <VBox fx:id="form" alignment="CENTER" spacing="16" maxWidth="400" maxHeight="380"
+          style="-fx-background-color: white; -fx-padding: 32; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 10, 0, 0, 4);">
+        <Label text="FU CINEMA" styleClass="brand"/>
+        <Label text="ĐĂNG NHẬP QUẦY VÉ" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #374151;"/>
+        
+        <VBox spacing="6" alignment="CENTER_LEFT" maxWidth="Infinity">
+            <Label text="Email đăng nhập:" style="-fx-font-weight: bold; -fx-text-fill: #4b5563;"/>
+            <TextField fx:id="tfUsername" promptText="admin@fucinema.vn" maxWidth="Infinity" style="-fx-pref-height: 36;"/>
+        </VBox>
+        
+        <VBox spacing="6" alignment="CENTER_LEFT" maxWidth="Infinity">
+            <Label text="Mật khẩu:" style="-fx-font-weight: bold; -fx-text-fill: #4b5563;"/>
+            <PasswordField fx:id="pfPassword" promptText="••••••••" maxWidth="Infinity" style="-fx-pref-height: 36;"/>
+        </VBox>
+        
+        <Button fx:id="btnLogin" text="Đăng nhập" defaultButton="true" onAction="#onLogin"
+                styleClass="primary" maxWidth="Infinity" style="-fx-pref-height: 38; -fx-font-size: 14px;"/>
+        <ProgressIndicator fx:id="progress" visible="false" prefWidth="28" prefHeight="28"/>
+    </VBox>
+</StackPane>
