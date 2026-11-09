@@ -14,6 +14,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * Controller điều khiển Dialog Thêm và Sửa phim (movie-dialog.fxml).
+ * <p>
+ * Áp dụng Event Filter trên nút OK để chặn sự kiện đóng Dialog khi form vi phạm
+ * Bean Validation (TC-D09), bảo vệ toàn vẹn dữ liệu trước khi gửi tới Facade.
+ */
 @Component
 @Scope("prototype")
 @RequiredArgsConstructor
