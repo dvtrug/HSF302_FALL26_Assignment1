@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fu.cinema.desktop.controller.ReportController" styleClass="page" stylesheets="@../../css/desktop-report.css">
+    <Label text="Báo cáo doanh thu bán vé" styleClass="page-title"/>
+    <HBox fx:id="filters" spacing="8" alignment="CENTER_LEFT">
+        <Label text="Từ ngày"/>
+        <DatePicker fx:id="fromDate" editable="false" prefWidth="140"/>
+        <Label text="Đến ngày"/>
+        <DatePicker fx:id="toDate" editable="false" prefWidth="140"/>
+        <Button fx:id="generateButton" text="Xem báo cáo" onAction="#onGenerate" styleClass="primary"/>
+        <Button fx:id="exportButton" text="Xuất CSV" onAction="#onExport" disable="true"/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="8">
+        <ProgressIndicator fx:id="progress" styleClass="report-progress" visible="false" managed="false"/>
+        <Label fx:id="status" text="Chọn khoảng ngày để xem báo cáo." wrapText="true"/>
+    </HBox>
+    <HBox spacing="12">
+        <BarChart fx:id="revenueChart" title="Doanh thu theo phim" legendVisible="false" animated="false"
+                  prefHeight="245" minHeight="210" minWidth="0" HBox.hgrow="ALWAYS">
+            <xAxis><CategoryAxis tickLabelRotation="-20"/></xAxis>
+            <yAxis><NumberAxis label="Doanh thu (đ)"/></yAxis>
+        </BarChart>
+        <PieChart fx:id="ticketsChart" title="Tỷ trọng số vé" animated="false" labelsVisible="false"
+                  prefHeight="245" minHeight="210" minWidth="0" HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <TableView fx:id="bookingsTable" VBox.vgrow="ALWAYS" prefHeight="220" minHeight="100">
+        <columns>
+            <TableColumn fx:id="idColumn" text="Mã đơn" prefWidth="70"/>
+            <TableColumn fx:id="dateColumn" text="Ngày đặt" prefWidth="150"/>
+            <TableColumn fx:id="customerColumn" text="Khách hàng" prefWidth="150"/>
+            <TableColumn fx:id="movieColumn" text="Phim" prefWidth="180"/>
+            <TableColumn fx:id="ticketColumn" text="Số vé" prefWidth="70"/>
+            <TableColumn fx:id="totalColumn" text="Tổng tiền" prefWidth="110"/>
+        </columns>
+        <placeholder><Label text="Không có đơn đã xác nhận trong kỳ."/></placeholder>
+    </TableView>
+    <HBox alignment="CENTER_RIGHT" spacing="8" styleClass="report-pagination">
+        <Button fx:id="previousPage" text="Trang trước" onAction="#onPreviousPage" disable="true"/>
+        <Label fx:id="pageStatus" text="Trang 0 / 0"/>
+        <Button fx:id="nextPage" text="Trang sau" onAction="#onNextPage" disable="true"/>
+    </HBox>
+</VBox>

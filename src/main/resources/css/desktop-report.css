@@ -1,0 +1,13 @@
+.report-progress {
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+}
+
+.report-pagination {
+    -fx-padding: 0 0 4 0;
+}
+
+.date-picker:error {
+    -fx-border-color: #b91c1c;
+    -fx-border-width: 1.5px;
+}
