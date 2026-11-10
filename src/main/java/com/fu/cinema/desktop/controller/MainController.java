@@ -7,7 +7,10 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
+import javafx.css.PseudoClass;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
@@ -23,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class MainController {
 
+    private static final PseudoClass ACTIVE = PseudoClass.getPseudoClass("active");
     private static final DateTimeFormatter CLOCK = DateTimeFormatter.ofPattern("HH:mm:ss  dd/MM/yyyy");
 
     private final SceneManager sceneManager;
@@ -37,7 +41,11 @@ public class MainController {
     @FXML
     private Label lblClock;
 
+    @FXML
+    private Button btnDashboard;
+
     private Timeline clock;
+    private Button activeButton;
 
     @FXML
     private void initialize() {
@@ -47,45 +55,45 @@ public class MainController {
         clock.setCycleCount(Animation.INDEFINITE);
         clock.play();
         lblClock.setText(LocalDateTime.now().format(CLOCK));
-        onDashboard();
+        showView(View.DASHBOARD, btnDashboard);
     }
 
     @FXML
-    private void onDashboard() {
-        trySwitch(View.DASHBOARD);
+    private void onDashboard(ActionEvent event) {
+        showView(View.DASHBOARD, (Button) event.getSource());
     }
 
     @FXML
-    private void onCounterSale() {
-        trySwitch(View.COUNTER_SALE);
+    private void onCounterSale(ActionEvent event) {
+        showView(View.COUNTER_SALE, (Button) event.getSource());
     }
 
     @FXML
-    private void onBooking() {
-        trySwitch(View.BOOKING);
+    private void onBooking(ActionEvent event) {
+        showView(View.BOOKING, (Button) event.getSource());
     }
 
     @FXML
-    private void onGenre() {
-        trySwitch(View.GENRE);
+    private void onGenre(ActionEvent event) {
+        showView(View.GENRE, (Button) event.getSource());
     }
 
     @FXML
-    private void onMovie() {
-        trySwitch(View.MOVIE);
+    private void onMovie(ActionEvent event) {
+        showView(View.MOVIE, (Button) event.getSource());
     }
 
     @FXML
-    private void onSchedule() {
-        trySwitch(View.SCHEDULE);
+    private void onSchedule(ActionEvent event) {
+        showView(View.SCHEDULE, (Button) event.getSource());
     }
 
     @FXML
-    private void onReport() {
-        trySwitch(View.REPORT);
+    private void onReport(ActionEvent event) {
+        showView(View.REPORT, (Button) event.getSource());
     }
 
-    private void trySwitch(View view) {
+    private void showView(View view, Button button) {
         try {
             sceneManager.showIn(root, view);
         } catch (Exception e) {
@@ -93,6 +101,11 @@ public class MainController {
             placeholder.setStyle("-fx-font-size: 18px; -fx-text-fill: #6b7280; -fx-padding: 40;");
             root.setCenter(placeholder);
         }
+        if (activeButton != null) {
+            activeButton.pseudoClassStateChanged(ACTIVE, false);
+        }
+        button.pseudoClassStateChanged(ACTIVE, true);
+        activeButton = button;
     }
 
     @FXML

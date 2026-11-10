@@ -9,8 +9,8 @@
     <left>
         <VBox styleClass="sidebar" spacing="6">
             <Label text="FU CINEMA" styleClass="brand"/>
-            <Button text="📊  Dashboard"        onAction="#onDashboard"   maxWidth="Infinity"/>
-            <Button text="🎟️  Bán vé tại quầy"  onAction="#onCounterSale" maxWidth="Infinity" styleClass="primary"/>
+            <Button fx:id="btnDashboard" text="📊  Dashboard"        onAction="#onDashboard"   maxWidth="Infinity"/>
+            <Button text="🎟️  Bán vé tại quầy"  onAction="#onCounterSale" maxWidth="Infinity"/>
             <Button text="📋  Đơn đặt vé"       onAction="#onBooking"     maxWidth="Infinity"/>
             <Separator/>
             <Button text="🏷️  Thể loại"          onAction="#onGenre"       maxWidth="Infinity"/>
