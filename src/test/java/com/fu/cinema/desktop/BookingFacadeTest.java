@@ -71,4 +71,19 @@ class BookingFacadeTest {
     @Test void pendingCanCancelWithoutConfirming() {
         facade.cancel(id); assertEquals(BookingStatus.CANCELLED, facade.detail(id).status());
     }
+    @Test void customerCanViewOwnBookingsAndCancelFutureShowtime() {
+        var customer = customers.findAll().getFirst();
+        new TransactionTemplate(tx).executeWithoutResult(status -> {
+            var booking = bookings.findById(id).orElseThrow();
+            var st = booking.getShowtime();
+            st.setStartTime(java.time.LocalDateTime.now().plusDays(2));
+            st.setEndTime(st.getStartTime().plusHours(2));
+            showtimes.save(st);
+        });
+        session.login(SessionUser.builder().accountId(customer.getAccount().getAccountId()).role(Role.CUSTOMER).displayName(customer.getFullName()).build());
+        var res = facade.search(BookingStatus.PENDING, null, null, null, 0);
+        assertFalse(res.items().isEmpty());
+        facade.cancel(id);
+        assertEquals(BookingStatus.CANCELLED, facade.detail(id).status());
+    }
 }

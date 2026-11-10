@@ -21,6 +21,7 @@
             <PasswordField fx:id="pfPassword" promptText="••••••••" maxWidth="Infinity" style="-fx-pref-height: 36;"/>
         </VBox>
         
+        <CheckBox fx:id="cbKiosk" text="Chế độ Kiosk cho khách (Bonus B2)" style="-fx-text-fill: #4b5563; -fx-font-size: 12px;"/>
         <Button fx:id="btnLogin" text="Đăng nhập" defaultButton="true" onAction="#onLogin"
                 styleClass="primary" maxWidth="Infinity" style="-fx-pref-height: 38; -fx-font-size: 14px;"/>
         <ProgressIndicator fx:id="progress" visible="false" prefWidth="28" prefHeight="28"/>
