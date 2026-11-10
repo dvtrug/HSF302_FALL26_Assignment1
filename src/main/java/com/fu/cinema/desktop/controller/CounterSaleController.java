@@ -98,18 +98,28 @@ public class CounterSaleController {
             }
         });
         bindControls();
-        customerQuery.textProperty().addListener((observable, previous, keyword) -> queueCustomerSearch(keyword));
         movie.valueProperty().addListener((observable, previous, selected) -> loadShowtimes(selected));
         showtime.valueProperty().addListener((observable, previous, selected) -> loadSeats(selected));
         read(sales::movies, items -> movie.getItems().setAll(items), AlertUtil::showError);
         if (session.getUser() != null && session.getUser().isCustomer()) {
             CustomerItem me = sales.getCurrentCustomer();
             if (me != null) {
-                customerResults.getItems().setAll(me);
-                customerResults.getSelectionModel().selectFirst();
                 customerQuery.setText(me.fullName());
                 customerQuery.setDisable(true);
+                customerResults.getItems().setAll(me);
+                customerResults.getSelectionModel().selectFirst();
+                customerResults.setDisable(true);
             }
+            if (paid != null) {
+                paid.setSelected(false);
+                paid.setVisible(false);
+                paid.setManaged(false);
+            }
+            if (sellButton != null) {
+                sellButton.setText("🎟️ Đặt vé ngay");
+            }
+        } else {
+            customerQuery.textProperty().addListener((observable, previous, keyword) -> queueCustomerSearch(keyword));
         }
     }
 
@@ -135,6 +145,9 @@ public class CounterSaleController {
     }
 
     private void queueCustomerSearch(String keyword) {
+        if (session.getUser() != null && session.getUser().isCustomer()) {
+            return;
+        }
         long request = ++customerRequest;
         searchDelay.stop();
         customerResults.getSelectionModel().clearSelection();

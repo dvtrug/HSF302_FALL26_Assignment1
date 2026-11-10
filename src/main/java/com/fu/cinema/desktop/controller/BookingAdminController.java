@@ -1,6 +1,7 @@
 package com.fu.cinema.desktop.controller;
 
 import com.fu.cinema.desktop.facade.BookingFacade;
+import com.fu.cinema.desktop.session.DesktopSession;
 import com.fu.cinema.desktop.model.BookingRow;
 import com.fu.cinema.desktop.model.BookingDetail;
 import com.fu.cinema.desktop.util.MoneyUtil;
@@ -31,6 +32,7 @@ import java.math.BigDecimal;
 public class BookingAdminController {
     private final BookingFacade facade;
     private final FxAsync async;
+    private final DesktopSession session;
     @FXML private VBox root;
     @FXML private ComboBox<BookingStatus> cbStatus;
     @FXML private DatePicker dpFrom, dpTo;
@@ -55,6 +57,12 @@ public class BookingAdminController {
 
     @FXML private void initialize() {
         tasks = async.forView(root);
+        if (session.getUser() != null && session.getUser().isCustomer()) {
+            btnConfirm.setVisible(false);
+            btnConfirm.setManaged(false);
+            tfKeyword.setVisible(false);
+            tfKeyword.setManaged(false);
+        }
         cbStatus.getItems().add(null);
         cbStatus.getItems().addAll(BookingStatus.values());
         progress.visibleProperty().bind(busy);
