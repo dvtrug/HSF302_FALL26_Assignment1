@@ -41,6 +41,13 @@ class AuthFacadeTest {
     }
 
     @Test
+    void customerAccount_canLoginKioskMode() {
+        SessionUser user = authFacade.loginKiosk("an.nv@gmail.com", "Customer@123");
+        assertNotNull(user);
+        assertTrue(user.isCustomer());
+    }
+
+    @Test
     void wrongPassword_throwsBusinessException() {
         assertThrows(BusinessException.class, () ->
                 authFacade.loginAdmin("admin@fucinema.vn", "WrongPassword"));

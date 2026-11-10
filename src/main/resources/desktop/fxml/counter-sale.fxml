@@ -34,6 +34,7 @@
             <CheckBox fx:id="paid" text="Đã thanh toán"/>
             <Label fx:id="total" styleClass="counter-total" wrapText="true"/>
             <Button fx:id="sellButton" text="Bán vé" styleClass="primary" onAction="#onSell" maxWidth="Infinity"/>
+            <Button fx:id="printButton" text="🖨️ In vé (Bonus B1)" onAction="#onPrint" maxWidth="Infinity" disable="true"/>
         </VBox>
         <ScrollPane fitToWidth="true" pannable="true" HBox.hgrow="ALWAYS" styleClass="counter-seat-scroll">
             <VBox spacing="12" styleClass="counter-seats">

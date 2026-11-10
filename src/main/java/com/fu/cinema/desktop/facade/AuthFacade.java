@@ -22,4 +22,11 @@ public class AuthFacade {
         }
         return user;
     }
+
+    /**
+     * Bonus B2: Xác thực tài khoản khách hàng hoặc nhân viên trong chế độ Kiosk tự phục vụ.
+     */
+    public SessionUser loginKiosk(String username, String password) {
+        return authService.login(username, password);
+    }
 }

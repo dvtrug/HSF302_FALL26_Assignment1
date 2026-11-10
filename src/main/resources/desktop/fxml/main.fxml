@@ -10,13 +10,13 @@
         <VBox styleClass="sidebar" spacing="6">
             <Label text="FU CINEMA" styleClass="brand"/>
             <Button fx:id="btnDashboard" text="📊  Dashboard"        onAction="#onDashboard"   maxWidth="Infinity"/>
-            <Button text="🎟️  Bán vé tại quầy"  onAction="#onCounterSale" maxWidth="Infinity"/>
-            <Button text="📋  Đơn đặt vé"       onAction="#onBooking"     maxWidth="Infinity"/>
-            <Separator/>
-            <Button text="🏷️  Thể loại"          onAction="#onGenre"       maxWidth="Infinity"/>
-            <Button text="🎬  Phim"              onAction="#onMovie"       maxWidth="Infinity"/>
-            <Button text="📅  Phòng &amp; Suất chiếu" onAction="#onSchedule" maxWidth="Infinity"/>
-            <Button text="📈  Báo cáo"           onAction="#onReport"      maxWidth="Infinity"/>
+            <Button fx:id="btnCounterSale" text="🎟️  Bán vé tại quầy"  onAction="#onCounterSale" maxWidth="Infinity"/>
+            <Button fx:id="btnBooking" text="📋  Đơn đặt vé"       onAction="#onBooking"     maxWidth="Infinity"/>
+            <Separator fx:id="sepAdmin"/>
+            <Button fx:id="btnGenre" text="🏷️  Thể loại"          onAction="#onGenre"       maxWidth="Infinity"/>
+            <Button fx:id="btnMovie" text="🎬  Phim"              onAction="#onMovie"       maxWidth="Infinity"/>
+            <Button fx:id="btnSchedule" text="📅  Phòng &amp; Suất chiếu" onAction="#onSchedule" maxWidth="Infinity"/>
+            <Button fx:id="btnReport" text="📈  Báo cáo"           onAction="#onReport"      maxWidth="Infinity"/>
             <Region VBox.vgrow="ALWAYS"/>
             <Button text="🚪  Đăng xuất"         onAction="#onLogout"      maxWidth="Infinity"/>
         </VBox>
@@ -25,6 +25,7 @@
         <HBox styleClass="status-bar" spacing="16" alignment="CENTER_LEFT">
             <Label fx:id="lblUser" text="Nhân viên: "/>
             <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnTheme" text="🌙 Dark" onAction="#onToggleTheme" style="-fx-font-size: 11px; -fx-padding: 2 8; -fx-cursor: hand;"/>
             <Label fx:id="lblClock" text="00:00:00"/>
         </HBox>
     </bottom>

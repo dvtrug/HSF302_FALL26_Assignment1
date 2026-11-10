@@ -8,7 +8,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.css.PseudoClass;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -35,6 +34,16 @@ public class MainController {
     @FXML
     private BorderPane root;
 
+    @FXML private javafx.scene.control.Button btnDashboard;
+    @FXML private javafx.scene.control.Button btnCounterSale;
+    @FXML private javafx.scene.control.Button btnBooking;
+    @FXML private javafx.scene.control.Separator sepAdmin;
+    @FXML private javafx.scene.control.Button btnGenre;
+    @FXML private javafx.scene.control.Button btnMovie;
+    @FXML private javafx.scene.control.Button btnSchedule;
+    @FXML private javafx.scene.control.Button btnReport;
+
+
     @FXML
     private Label lblUser;
 
@@ -42,55 +51,80 @@ public class MainController {
     private Label lblClock;
 
     @FXML
-    private Button btnDashboard;
+    private javafx.scene.control.Button btnTheme;
+
+    @FXML
+    private void onToggleTheme() {
+        if (root.getStyleClass().contains("dark-theme")) {
+            root.getStyleClass().remove("dark-theme");
+            if (btnTheme != null) btnTheme.setText("🌙 Dark");
+        } else {
+            root.getStyleClass().add("dark-theme");
+            if (btnTheme != null) btnTheme.setText("☀️ Light");
+        }
+    }
 
     private Timeline clock;
     private Button activeButton;
 
     @FXML
     private void initialize() {
-        lblUser.textProperty().bind(Bindings.concat("Nhân viên: ", session.displayNameProperty()));
         clock = new Timeline(new KeyFrame(Duration.seconds(1),
                 e -> lblClock.setText(LocalDateTime.now().format(CLOCK))));
         clock.setCycleCount(Animation.INDEFINITE);
         clock.play();
         lblClock.setText(LocalDateTime.now().format(CLOCK));
+
+        boolean isCustomer = session.getUser() != null && session.getUser().isCustomer();
+        if (isCustomer) {
+            lblUser.setText("Khách hàng (Kiosk): " + session.getUser().getDisplayName());
+            if (btnDashboard != null) { btnDashboard.setVisible(false); btnDashboard.setManaged(false); }
+            if (btnGenre != null) { btnGenre.setVisible(false); btnGenre.setManaged(false); }
+            if (btnMovie != null) { btnMovie.setVisible(false); btnMovie.setManaged(false); }
+            if (btnSchedule != null) { btnSchedule.setVisible(false); btnSchedule.setManaged(false); }
+            if (btnReport != null) { btnReport.setVisible(false); btnReport.setManaged(false); }
+            if (sepAdmin != null) { sepAdmin.setVisible(false); sepAdmin.setManaged(false); }
+            if (btnCounterSale != null) { btnCounterSale.setText("🎟️  Đặt vé (Kiosk)"); }
+            onCounterSale();
+        } else {
+            lblUser.textProperty().bind(Bindings.concat("Nhân viên: ", session.displayNameProperty()));
+            onDashboard();
+        }
+    }
+
+    @FXML
+    private void onDashboard() {
         showView(View.DASHBOARD, btnDashboard);
     }
 
     @FXML
-    private void onDashboard(ActionEvent event) {
-        showView(View.DASHBOARD, (Button) event.getSource());
+    private void onCounterSale() {
+        showView(View.COUNTER_SALE, btnCounterSale);
     }
 
     @FXML
-    private void onCounterSale(ActionEvent event) {
-        showView(View.COUNTER_SALE, (Button) event.getSource());
+    private void onBooking() {
+        showView(View.BOOKING, btnBooking);
     }
 
     @FXML
-    private void onBooking(ActionEvent event) {
-        showView(View.BOOKING, (Button) event.getSource());
+    private void onGenre() {
+        showView(View.GENRE, btnGenre);
     }
 
     @FXML
-    private void onGenre(ActionEvent event) {
-        showView(View.GENRE, (Button) event.getSource());
+    private void onMovie() {
+        showView(View.MOVIE, btnMovie);
     }
 
     @FXML
-    private void onMovie(ActionEvent event) {
-        showView(View.MOVIE, (Button) event.getSource());
+    private void onSchedule() {
+        showView(View.SCHEDULE, btnSchedule);
     }
 
     @FXML
-    private void onSchedule(ActionEvent event) {
-        showView(View.SCHEDULE, (Button) event.getSource());
-    }
-
-    @FXML
-    private void onReport(ActionEvent event) {
-        showView(View.REPORT, (Button) event.getSource());
+    private void onReport() {
+        showView(View.REPORT, btnReport);
     }
 
     private void showView(View view, Button button) {

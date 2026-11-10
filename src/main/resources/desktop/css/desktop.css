@@ -228,3 +228,15 @@
 .legend-free { -fx-background-color: #e5e7eb; }
 .legend-selected { -fx-background-color: #16a34a; }
 .legend-sold { -fx-background-color: #6b7280; }
+
+/* ===== Bonus B5: Dark Theme ===== */
+.dark-theme.main, .dark-theme .main {
+    -fx-background-color: #111827;
+}
+.dark-theme .status-bar {
+    -fx-background-color: #111827;
+    -fx-border-color: #374151;
+}
+.dark-theme .status-bar .label {
+    -fx-text-fill: #9ca3af;
+}

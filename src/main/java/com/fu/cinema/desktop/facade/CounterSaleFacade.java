@@ -7,6 +7,7 @@ import com.fu.cinema.desktop.model.SaleResult;
 import com.fu.cinema.desktop.session.DesktopSession;
 import com.fu.cinema.dto.BookingRequest;
 import com.fu.cinema.entity.Ticket;
+import com.fu.cinema.repository.CustomerRepository;
 import com.fu.cinema.service.CustomerService;
 import com.fu.cinema.service.MovieService;
 import com.fu.cinema.service.ShowtimeService;
@@ -27,6 +28,7 @@ public class CounterSaleFacade {
     private final ShowtimeService showtimes;
     private final BookingService bookings;
     private final DesktopSession session;
+    private final CustomerRepository customerRepository;
 
     public List<CustomerItem> searchCustomers(String keyword) {
         session.requireAdmin();
@@ -46,7 +48,19 @@ public class CounterSaleFacade {
     /** Create tickets and optionally confirm them atomically (BR-10/11/12, BR-D2). */
     @Transactional
     public SaleResult sell(Long customerId, Long showtimeId, List<String> seats, boolean paid) {
-        session.requireAdmin();
+        var u = session.getUser();
+        if (u == null) {
+            session.requireAdmin();
+        } else if (!u.isAdmin()) {
+            if (!u.isCustomer()) {
+                session.requireAdmin();
+            } else {
+                var c = customerRepository.findByAccount_AccountId(u.getAccountId()).orElse(null);
+                if (c == null || !c.getCustomerId().equals(customerId)) {
+                    session.requireAdmin();
+                }
+            }
+        }
         BookingRequest request = new BookingRequest();
         request.setShowtimeId(showtimeId);
         request.setSeatCodes(new java.util.ArrayList<>(seats));
@@ -55,4 +69,17 @@ public class CounterSaleFacade {
         return new SaleResult(booking.getBookingId(), booking.getTickets().stream().map(Ticket::getSeatCode).sorted().toList(),
                 booking.getTotalAmount(), booking.getStatus());
     }
+
+    public CustomerItem getCurrentCustomer() {
+        var u = session.getUser();
+        if (u == null) return null;
+        if (u.isCustomer()) {
+            return customerRepository.findByAccount_AccountId(u.getAccountId())
+                    .map(c -> new CustomerItem(c.getCustomerId(), c.getFullName(), c.getMobile(),
+                            Period.between(c.getBirthday(), LocalDate.now()).getYears()))
+                    .orElse(null);
+        }
+        return null;
+    }
+
 }
