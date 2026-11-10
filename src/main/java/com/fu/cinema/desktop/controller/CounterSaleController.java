@@ -7,10 +7,16 @@ import com.fu.cinema.desktop.model.CounterMovieItem;
 import com.fu.cinema.desktop.model.CustomerItem;
 import com.fu.cinema.desktop.model.ShowtimeItem;
 import com.fu.cinema.desktop.model.SeatMapData;
+import com.fu.cinema.desktop.session.DesktopSession;
 import com.fu.cinema.desktop.util.AlertUtil;
 import com.fu.cinema.desktop.util.FxAsync;
 import com.fu.cinema.desktop.util.MoneyUtil;
 import javafx.animation.PauseTransition;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import com.fu.cinema.desktop.model.SaleResult;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -45,6 +51,7 @@ public class CounterSaleController {
     private final CounterSaleFacade sales;
     private final SeatMapFacade seats;
     private final FxAsync async;
+    private final DesktopSession session;
 
     @FXML private VBox root;
     @FXML private HBox form;
@@ -59,6 +66,15 @@ public class CounterSaleController {
     @FXML private Button sellButton;
     @FXML private ProgressIndicator progress;
     @FXML private SeatMapView seatMap;
+    @FXML private Button printButton;
+
+    private final Timeline seatAutoRefresh = new Timeline(
+            new KeyFrame(Duration.seconds(10), event -> refreshSeatsQuietly())
+    );
+    private SaleResult lastSale;
+    private CustomerItem lastCustomer;
+    private ShowtimeItem lastShowtime;
+
 
     private final PauseTransition searchDelay = new PauseTransition(Duration.millis(300));
     private final BooleanProperty seatsReady = new SimpleBooleanProperty();
@@ -73,8 +89,12 @@ public class CounterSaleController {
     private void initialize() {
         readsForView = async.forView(root);
         root.sceneProperty().addListener((observable, previous, scene) -> {
-            if (previous != null && scene == null) {
+            if (scene != null) {
+                seatAutoRefresh.setCycleCount(Animation.INDEFINITE);
+                seatAutoRefresh.play();
+            } else if (previous != null) {
                 searchDelay.stop();
+                seatAutoRefresh.stop();
             }
         });
         bindControls();
@@ -82,6 +102,15 @@ public class CounterSaleController {
         movie.valueProperty().addListener((observable, previous, selected) -> loadShowtimes(selected));
         showtime.valueProperty().addListener((observable, previous, selected) -> loadSeats(selected));
         read(sales::movies, items -> movie.getItems().setAll(items), AlertUtil::showError);
+        if (session.getUser() != null && session.getUser().isCustomer()) {
+            CustomerItem me = sales.getCurrentCustomer();
+            if (me != null) {
+                customerResults.getItems().setAll(me);
+                customerResults.getSelectionModel().selectFirst();
+                customerQuery.setText(me.fullName());
+                customerQuery.setDisable(true);
+            }
+        }
     }
 
     private void bindControls() {
@@ -191,6 +220,12 @@ public class CounterSaleController {
             if (root.getScene() != null) {
                 paid.setSelected(false);
                 status.setText("Đã tạo đơn #" + result.bookingId() + " · " + result.status());
+                lastSale = result;
+                lastCustomer = customer;
+                lastShowtime = selected;
+                if (printButton != null) {
+                    printButton.setDisable(false);
+                }
                 loadSeats(selected);
                 AlertUtil.info(status.getText() + "\nGhế: " + String.join(", ", result.seats())
                         + "\nTổng tiền: " + MoneyUtil.format(result.total()));
@@ -215,5 +250,71 @@ public class CounterSaleController {
             reads.set(reads.get() - 1);
             failure.accept(error);
         });
+    }
+
+    private void refreshSeatsQuietly() {
+        var selected = showtime.getValue();
+        if (selected == null || !seatsReady.get() || selling.get()) {
+            return;
+        }
+        var currentlySelected = List.copyOf(seatMap.getSelectedSeats());
+        async.run(() -> seats.load(selected.id()), data -> {
+            if (root.getScene() != null && showtime.getValue() != null && showtime.getValue().id().equals(selected.id())) {
+                seatMap.setData(data);
+                for (String code : currentlySelected) {
+                    if (!data.soldSeats().contains(code)) {
+                        seatMap.getSelectedSeats().add(code);
+                    }
+                }
+            }
+        }, null, null);
+    }
+
+    @FXML
+    private void onPrint() {
+        if (lastSale == null || lastCustomer == null || lastShowtime == null) {
+            AlertUtil.warn("Chưa có đơn vé gần nhất để in.");
+            return;
+        }
+        try {
+            javafx.print.PrinterJob job = javafx.print.PrinterJob.createPrinterJob();
+            if (job == null) {
+                AlertUtil.info("Không tìm thấy máy in. Hệ thống đã lưu vé #" + lastSale.bookingId() + " an toàn.");
+                return;
+            }
+            VBox ticket = new VBox(6);
+            ticket.setStyle("-fx-padding: 16; -fx-background-color: white; -fx-font-family: 'Segoe UI', sans-serif;");
+            ticket.setPrefWidth(280);
+
+            Label title = new Label("FU CINEMA - VÉ XEM PHIM");
+            title.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #e50914;");
+            Label dash = new Label("--------------------------------");
+            Label bId = new Label("Mã đơn: #" + lastSale.bookingId() + " (" + lastSale.status() + ")");
+            Label cName = new Label("Khách hàng: " + lastCustomer.fullName() + " (" + lastCustomer.mobile() + ")");
+            Label mTitle = new Label("Phim: " + (movie.getValue() != null ? movie.getValue().title() : ""));
+            Label sTime = new Label("Suất: " + lastShowtime.toString());
+            Label sList = new Label("Ghế: " + String.join(", ", lastSale.seats()));
+            sList.setStyle("-fx-font-weight: bold;");
+            Label totalLbl = new Label("Tổng tiền: " + MoneyUtil.format(lastSale.total()));
+            totalLbl.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+            Label footer = new Label("\nChúc quý khách xem phim vui vẻ!");
+            footer.setStyle("-fx-font-size: 11px; -fx-text-fill: #555;");
+
+            ticket.getChildren().addAll(title, dash, bId, cName, mTitle, sTime, sList, totalLbl, footer);
+
+            if (root.getScene() != null && root.getScene().getWindow() != null) {
+                boolean proceed = job.showPrintDialog(root.getScene().getWindow());
+                if (proceed) {
+                    if (job.printPage(ticket)) {
+                        job.endJob();
+                        AlertUtil.info("Đã in vé thành công cho đơn #" + lastSale.bookingId() + "!");
+                    } else {
+                        job.cancelJob();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            AlertUtil.showError(e);
+        }
     }
 }

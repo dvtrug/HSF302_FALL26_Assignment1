@@ -230,6 +230,7 @@ facade được tạo tại `target/site/jacoco/index.html`.
 - [Phân công 5 thành viên](docs/desktop-contributions.md)
 - [Ma trận nghiệm thu TC-D01–TC-D20](docs/desktop-acceptance.md)
 - [Các bước chuẩn bị và phát hành v2.0.0](docs/desktop-release.md)
+- [Kế hoạch & Triển khai Part R — Bonus (+1.0 điểm)](docs/desktop-bonus-part-r.md)
 
 ### Ảnh chạy thử với dữ liệu mẫu H2
 

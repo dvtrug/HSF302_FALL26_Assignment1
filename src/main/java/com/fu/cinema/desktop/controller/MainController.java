@@ -31,23 +31,61 @@ public class MainController {
     @FXML
     private BorderPane root;
 
+    @FXML private javafx.scene.control.Button btnDashboard;
+    @FXML private javafx.scene.control.Button btnCounterSale;
+    @FXML private javafx.scene.control.Button btnBooking;
+    @FXML private javafx.scene.control.Separator sepAdmin;
+    @FXML private javafx.scene.control.Button btnGenre;
+    @FXML private javafx.scene.control.Button btnMovie;
+    @FXML private javafx.scene.control.Button btnSchedule;
+    @FXML private javafx.scene.control.Button btnReport;
+
+
     @FXML
     private Label lblUser;
 
     @FXML
     private Label lblClock;
 
+    @FXML
+    private javafx.scene.control.Button btnTheme;
+
+    @FXML
+    private void onToggleTheme() {
+        if (root.getStyleClass().contains("dark-theme")) {
+            root.getStyleClass().remove("dark-theme");
+            if (btnTheme != null) btnTheme.setText("🌙 Dark");
+        } else {
+            root.getStyleClass().add("dark-theme");
+            if (btnTheme != null) btnTheme.setText("☀️ Light");
+        }
+    }
+
     private Timeline clock;
 
     @FXML
     private void initialize() {
-        lblUser.textProperty().bind(Bindings.concat("Nhân viên: ", session.displayNameProperty()));
         clock = new Timeline(new KeyFrame(Duration.seconds(1),
                 e -> lblClock.setText(LocalDateTime.now().format(CLOCK))));
         clock.setCycleCount(Animation.INDEFINITE);
         clock.play();
         lblClock.setText(LocalDateTime.now().format(CLOCK));
-        onDashboard();
+
+        boolean isCustomer = session.getUser() != null && session.getUser().isCustomer();
+        if (isCustomer) {
+            lblUser.setText("Khách hàng (Kiosk): " + session.getUser().getDisplayName());
+            if (btnDashboard != null) { btnDashboard.setVisible(false); btnDashboard.setManaged(false); }
+            if (btnGenre != null) { btnGenre.setVisible(false); btnGenre.setManaged(false); }
+            if (btnMovie != null) { btnMovie.setVisible(false); btnMovie.setManaged(false); }
+            if (btnSchedule != null) { btnSchedule.setVisible(false); btnSchedule.setManaged(false); }
+            if (btnReport != null) { btnReport.setVisible(false); btnReport.setManaged(false); }
+            if (sepAdmin != null) { sepAdmin.setVisible(false); sepAdmin.setManaged(false); }
+            if (btnCounterSale != null) { btnCounterSale.setText("🎟️  Đặt vé (Kiosk)"); }
+            onCounterSale();
+        } else {
+            lblUser.textProperty().bind(Bindings.concat("Nhân viên: ", session.displayNameProperty()));
+            onDashboard();
+        }
     }
 
     @FXML

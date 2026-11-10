@@ -104,6 +104,17 @@ class CounterSaleFacadeTest {
             assertEquals(1L, active);
         }
     }
+    @Test void customerCanBookSelfAndCannotBookOther() {
+        var customer = customers.findById(customerId).orElseThrow();
+        session.login(SessionUser.builder().accountId(customer.getAccount().getAccountId()).role(Role.CUSTOMER).displayName(customer.getFullName()).build());
+        var me = facade.getCurrentCustomer();
+        assertNotNull(me);
+        assertEquals(customerId, me.id());
+        var res = facade.sell(customerId, showtimeId, List.of("B1"), false);
+        assertEquals(BookingStatus.PENDING, res.status());
+        assertThrows(BusinessException.class, () -> facade.sell(minorId, showtimeId, List.of("B2"), false));
+    }
+
     private boolean attempt(CountDownLatch ready,CountDownLatch start,Runnable action) throws Exception {
         ready.countDown();start.await();
         try{action.run();return true;}catch(BusinessException ex){assertTrue(ex.getMessage().contains("Ghế đã có người đặt"));return false;}

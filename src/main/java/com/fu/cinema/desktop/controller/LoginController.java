@@ -9,6 +9,7 @@ import com.fu.cinema.desktop.util.FxAsync;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
@@ -37,6 +38,9 @@ public class LoginController {
     private PasswordField pfPassword;
 
     @FXML
+    private CheckBox cbKiosk;
+
+    @FXML
     private Button btnLogin;
 
     @FXML
@@ -57,7 +61,7 @@ public class LoginController {
         progress.setVisible(true);
 
         fxAsync.run(
-                () -> authFacade.loginAdmin(username, password),
+                () -> (cbKiosk != null && cbKiosk.isSelected()) ? authFacade.loginKiosk(username, password) : authFacade.loginAdmin(username, password),
                 user -> {
                     progress.setVisible(false);
                     session.login(user);
