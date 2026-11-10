@@ -43,6 +43,7 @@ public class DataSeeder implements CommandLineRunner {
                 accountRepository.save(new Account("locked_user", passwordEncoder.encode("123456"),
                         Role.CUSTOMER, AccountStatus.LOCKED));
             }
+            ensureUpcomingShowtimes();
             return;                                                          // đã có data
         }
         log.info(">>> Seeding sample data...");
@@ -148,5 +149,35 @@ public class DataSeeder implements CommandLineRunner {
         b.setTotalAmount(showtime.getTicketPrice().multiply(BigDecimal.valueOf(seats.length)));
         List.of(seats).forEach(seat -> b.addTicket(new Ticket(showtime, seat, showtime.getTicketPrice())));
         bookingRepository.save(b);
+    }
+
+    private void ensureUpcomingShowtimes() {
+        LocalDate today = LocalDate.now();
+        List<Movie> showingMovies = movieRepository.findByStatusNotOrderByTitleAsc(MovieStatus.STOPPED)
+                .stream().filter(m -> m.getStatus() == MovieStatus.SHOWING).toList();
+        List<Room> activeRooms = roomRepository.findAll().stream().filter(r -> r.getStatus() == RoomStatus.ACTIVE).toList();
+        if (showingMovies.isEmpty() || activeRooms.isEmpty()) {
+            return;
+        }
+
+        boolean hasUpcoming = showingMovies.stream().anyMatch(m ->
+                !showtimeRepository.findByMovie_MovieIdAndStatusAndStartTimeAfterOrderByStartTimeAsc(
+                        m.getMovieId(), ShowtimeStatus.OPEN, LocalDateTime.now()).isEmpty());
+
+        if (!hasUpcoming) {
+            log.info(">>> Đang tự động bổ sung suất chiếu tương lai cho các phim đang chiếu...");
+            Room r1 = activeRooms.get(0);
+            Room r2 = activeRooms.size() > 1 ? activeRooms.get(1) : r1;
+            int offset = 0;
+            for (Movie m : showingMovies) {
+                LocalDateTime startToday = today.atTime(19 + (offset % 3), (offset * 15) % 60);
+                if (startToday.isAfter(LocalDateTime.now())) {
+                    showtime(m, r1, startToday, 85000, ShowtimeStatus.OPEN);
+                }
+                showtime(m, r1, today.plusDays(1).atTime(9 + offset * 4, 0), 80000, ShowtimeStatus.OPEN);
+                showtime(m, r2, today.plusDays(2).atTime(18 + offset, 30), 90000, ShowtimeStatus.OPEN);
+                offset++;
+            }
+        }
     }
 }
