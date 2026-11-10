@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.fu.cinema.desktop.controller.MovieController"
+      fx:id="root" styleClass="page" spacing="14">
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Quản Lý Phim" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <ProgressIndicator fx:id="progress" prefWidth="24" prefHeight="24" visible="false"/>
+        <Button fx:id="btnNew" text="+ Thêm phim mới" styleClass="button, primary"/>
+    </HBox>
+
+    <!-- Thanh tìm kiếm và bộ lọc -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="tfKeyword" promptText="Tìm theo tên phim, đạo diễn..." prefWidth="250"/>
+        <ComboBox fx:id="cbGenre" promptText="Tất cả thể loại" prefWidth="180"/>
+        <ComboBox fx:id="cbStatus" promptText="Tất cả trạng thái" prefWidth="160"/>
+        <Button fx:id="btnReset" text="Đặt lại" onAction="#onResetFilters"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblTotal" text="Tổng số: 0 phim" style="-fx-text-fill: #6b7280;"/>
+    </HBox>
+
+    <!-- Bảng danh sách phim -->
+    <TableView fx:id="tableMovies" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+            <TableColumn fx:id="colTitle" text="Tên phim" prefWidth="220"/>
+            <TableColumn fx:id="colGenre" text="Thể loại" prefWidth="120"/>
+            <TableColumn fx:id="colDuration" text="Thời lượng" prefWidth="90"/>
+            <TableColumn fx:id="colReleaseDate" text="Ngày khởi chiếu" prefWidth="120"/>
+            <TableColumn fx:id="colAgeRating" text="Độ tuổi" prefWidth="80"/>
+            <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120"/>
+            <TableColumn fx:id="colActions" text="Thao tác" prefWidth="150"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+    <!-- Điều khiển phân trang -->
+    <HBox alignment="CENTER">
+        <Pagination fx:id="pagination" maxPageIndicatorCount="7" pageCount="1"/>
+    </HBox>
+</VBox>
