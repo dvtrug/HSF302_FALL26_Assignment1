@@ -199,3 +199,52 @@ Nhóm áp dụng nghiêm ngặt quy trình làm việc chuyên nghiệp:
 * **Báo cáo hoàn chỉnh (Word):** [docs/Assignment1_Report_Group6.docx](docs/Assignment1_Report_Group6.docx)
 * **Trưởng nhóm:** Đỗ Võ Thanh Trung (`thanhtrungxxz@gmail.com`).
 * **GitHub Project:** [https://github.com/dvtrug/HSF302_FALL26_Assignment1](https://github.com/dvtrug/HSF302_FALL26_Assignment1)
+
+## 10. FU Cinema Desktop (Assignment 2)
+
+Cần JDK 21, Maven Wrapper đi kèm và môi trường có giao diện đồ họa. Web và
+desktop dùng chung SQL Server. Tạo `application-local.properties` như mục 5,
+sau đó mở PowerShell tại thư mục gốc và chọn lệnh theo giao diện cần chạy.
+
+```powershell
+# Desktop (JavaFX, không khởi động máy chủ web)
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=local,desktop' '-Dspring-boot.run.main-class=com.fu.cinema.desktop.DesktopLauncher'
+
+# Web tại http://localhost:8080
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=local' '-Dspring-boot.run.main-class=com.fu.cinema.FuCinemaTicketSystemApplication'
+```
+
+Tài khoản demo desktop là `admin` với mật khẩu `Admin@123`. Đăng nhập desktop
+yêu cầu quyền ADMIN. Để thử desktop với dữ liệu mẫu trên H2 trong bộ nhớ:
+
+```powershell
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=test,desktop' '-Dspring-boot.run.useTestClasspath=true' '-Dspring-boot.run.main-class=com.fu.cinema.desktop.DesktopLauncher'
+```
+
+Chạy `.\mvnw.cmd -B -ntp clean verify` để kiểm thử và đóng gói. Trên Linux
+thiếu màn hình X, chạy `xvfb-run -a ./mvnw -B -ntp clean verify` để kiểm tra cả
+các test JavaFX cần hiển thị. Báo cáo JaCoCo của tầng service và desktop
+facade được tạo tại `target/site/jacoco/index.html`.
+
+- [Bảng phân công và nhánh theo issue](docs/Assignment2_Board.md)
+- [Phân công 5 thành viên](docs/desktop-contributions.md)
+- [Ma trận nghiệm thu TC-D01–TC-D20](docs/desktop-acceptance.md)
+- [Các bước chuẩn bị và phát hành v2.0.0](docs/desktop-release.md)
+
+### Ảnh chạy thử với dữ liệu mẫu H2
+
+| Đăng nhập | Khung quản trị |
+| --- | --- |
+| <img src="docs/screenshots/desktop/01-dang-nhap.png" alt="Màn hình đăng nhập desktop" width="440"> | <img src="docs/screenshots/desktop/02-khung-quan-tri.png" alt="Khung điều hướng sau khi đăng nhập" width="440"> |
+
+| Xem trước sơ đồ ghế | Cảnh báo giới hạn |
+| --- | --- |
+| <img src="docs/screenshots/desktop/03-so-do-ghe.png" alt="Sơ đồ phòng 8 hàng và 12 ghế mỗi hàng" width="440"> | <img src="docs/screenshots/desktop/04-gioi-han-8-ghe.png" alt="Cảnh báo khi chọn ghế thứ chín" width="360"> |
+
+| Báo cáo có dữ liệu | Báo cáo kỳ rỗng |
+| --- | --- |
+| <img src="docs/screenshots/desktop/05-bao-cao-doanh-thu.png" alt="Báo cáo doanh thu có biểu đồ và đơn xác nhận" width="440"> | <img src="docs/screenshots/desktop/06-bao-cao-ky-rong.png" alt="Báo cáo kỳ rỗng và nút xuất bị khóa" width="440"> |
+
+Ảnh khung quản trị và sơ đồ ghế chụp trên bản chạy thử trước tích hợp.
+Sơ đồ ghế được nhúng vào khung để kiểm tra component của #54. Luồng bán vé
+tại quầy được nghiệm thu riêng sau khi có #55.

@@ -20,6 +20,11 @@ jobs:
           cache: maven
 
       - name: Build & test
-        run: mvn -B -ntp verify
+        run: |
+          if ! command -v xvfb-run >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y xvfb xauth
+          fi
+          xvfb-run -a mvn -B -ntp verify
         env:
           SPRING_PROFILES_ACTIVE: test

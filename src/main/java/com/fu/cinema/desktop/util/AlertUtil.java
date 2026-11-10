@@ -4,6 +4,9 @@ import com.fu.cinema.exception.BusinessException;
 import com.fu.cinema.exception.ResourceNotFoundException;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.stage.Screen;
+import javafx.geometry.Rectangle2D;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.CannotCreateTransactionException;
 
@@ -47,6 +50,7 @@ public final class AlertUtil {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
         a.setTitle("Xác nhận");
         a.setHeaderText(null);
+        fitContent(a, message);
         return a.showAndWait().filter(b -> b == ButtonType.YES).isPresent();
     }
 
@@ -54,6 +58,24 @@ public final class AlertUtil {
         Alert a = new Alert(type, message, ButtonType.OK);
         a.setTitle(title);
         a.setHeaderText(null);
+        fitContent(a, message);
         a.showAndWait();
+    }
+
+    /** Wrap long business messages within the usable screen bounds. Call on the FX thread. */
+    private static void fitContent(Alert alert, String message) {
+        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+        double width = Math.min(560, bounds.getWidth() * 0.8);
+        Label content = new Label(message);
+        content.setWrapText(true);
+        content.setMaxWidth(Double.MAX_VALUE);
+        javafx.scene.control.ScrollPane scroll = new javafx.scene.control.ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.setPrefViewportWidth(width - 80);
+        scroll.setMaxHeight(bounds.getHeight() * 0.6);
+        alert.getDialogPane().setContent(scroll);
+        alert.getDialogPane().setPrefWidth(width);
+        alert.getDialogPane().setMaxHeight(bounds.getHeight() * 0.8);
+        alert.setResizable(true);
     }
 }
