@@ -7,7 +7,9 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
@@ -23,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class MainController {
 
+    private static final PseudoClass ACTIVE = PseudoClass.getPseudoClass("active");
     private static final DateTimeFormatter CLOCK = DateTimeFormatter.ofPattern("HH:mm:ss  dd/MM/yyyy");
 
     private final SceneManager sceneManager;
@@ -62,6 +65,7 @@ public class MainController {
     }
 
     private Timeline clock;
+    private Button activeButton;
 
     @FXML
     private void initialize() {
@@ -90,40 +94,40 @@ public class MainController {
 
     @FXML
     private void onDashboard() {
-        trySwitch(View.DASHBOARD);
+        showView(View.DASHBOARD, btnDashboard);
     }
 
     @FXML
     private void onCounterSale() {
-        trySwitch(View.COUNTER_SALE);
+        showView(View.COUNTER_SALE, btnCounterSale);
     }
 
     @FXML
     private void onBooking() {
-        trySwitch(View.BOOKING);
+        showView(View.BOOKING, btnBooking);
     }
 
     @FXML
     private void onGenre() {
-        trySwitch(View.GENRE);
+        showView(View.GENRE, btnGenre);
     }
 
     @FXML
     private void onMovie() {
-        trySwitch(View.MOVIE);
+        showView(View.MOVIE, btnMovie);
     }
 
     @FXML
     private void onSchedule() {
-        trySwitch(View.SCHEDULE);
+        showView(View.SCHEDULE, btnSchedule);
     }
 
     @FXML
     private void onReport() {
-        trySwitch(View.REPORT);
+        showView(View.REPORT, btnReport);
     }
 
-    private void trySwitch(View view) {
+    private void showView(View view, Button button) {
         try {
             sceneManager.showIn(root, view);
         } catch (Exception e) {
@@ -131,6 +135,11 @@ public class MainController {
             placeholder.setStyle("-fx-font-size: 18px; -fx-text-fill: #6b7280; -fx-padding: 40;");
             root.setCenter(placeholder);
         }
+        if (activeButton != null) {
+            activeButton.pseudoClassStateChanged(ACTIVE, false);
+        }
+        button.pseudoClassStateChanged(ACTIVE, true);
+        activeButton = button;
     }
 
     @FXML

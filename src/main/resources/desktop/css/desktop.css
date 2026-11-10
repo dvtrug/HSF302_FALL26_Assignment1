@@ -24,7 +24,12 @@
 }
 
 .sidebar .button:hover {
-    -fx-background-color: #374151;
+    -fx-background-color: rgba(229, 9, 20, 0.24);
+    -fx-text-fill: #ffffff;
+}
+
+.sidebar .button:active {
+    -fx-background-color: #e50914;
     -fx-text-fill: #ffffff;
 }
 
