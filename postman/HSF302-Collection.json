@@ -1,0 +1,983 @@
+{
+  "info": {
+    "_postman_id": "46d6244a-8e21-46cd-9879-fef3e7b31355",
+    "name": "HSF302 Collection",
+    "description": "Spring MVC integration checks. Run folders in order. Read-only business coverage with login/logout; no fake REST endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 Public pages",
+      "item": [
+        {
+          "name": "Home",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/",
+            "description": "GET / — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Movie catalog",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/movies",
+            "description": "GET /movies — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Movie search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/movies?kw=Bi%E1%BB%87t",
+            "description": "GET /movies?kw=Bi%E1%BB%87t — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Movie page zero",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/movies?page=0",
+            "description": "GET /movies?page=0 — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login form",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/login",
+            "description": "GET /login — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registration form",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/register",
+            "description": "GET /register — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Access control",
+      "item": [
+        {
+          "name": "Anonymous admin dashboard redirects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin",
+            "description": "GET /admin — expected HTTP 302."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 302\", function () { pm.response.to.have.status(302); });",
+                  "pm.test(\"Redirect to /login\", function () { pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/login\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous genre list redirects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/genres",
+            "description": "GET /admin/genres — expected HTTP 302."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 302\", function () { pm.response.to.have.status(302); });",
+                  "pm.test(\"Redirect to /login\", function () { pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/login\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anonymous customer profile redirects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/customer/profile",
+            "description": "GET /customer/profile — expected HTTP 302."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 302\", function () { pm.response.to.have.status(302); });",
+                  "pm.test(\"Redirect to /login\", function () { pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/login\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid login stays on form",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/login",
+            "description": "POST /login — expected HTTP 200.",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "nobody@example.invalid",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "incorrect",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Admin session and modules",
+      "item": [
+        {
+          "name": "Admin login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/login",
+            "description": "POST /login — expected HTTP 302.",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{adminUsername}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{adminPassword}}",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 302\", function () { pm.response.to.have.status(302); });",
+                  "pm.test(\"Redirect to /admin\", function () { pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/admin\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin",
+            "description": "GET /admin — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Genres",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/genres",
+            "description": "GET /admin/genres — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "New genre form",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/genres/new",
+            "description": "GET /admin/genres/new — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Movies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/movies",
+            "description": "GET /admin/movies — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Movies filtered",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/movies?kw=Bi%E1%BB%87t&page=0",
+            "description": "GET /admin/movies?kw=Bi%E1%BB%87t&page=0 — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "New movie form",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/movies/new",
+            "description": "GET /admin/movies/new — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rooms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/rooms",
+            "description": "GET /admin/rooms — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "New room form",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/rooms/new",
+            "description": "GET /admin/rooms/new — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Showtimes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/showtimes",
+            "description": "GET /admin/showtimes — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "New showtime form",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/showtimes/new",
+            "description": "GET /admin/showtimes/new — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/customers",
+            "description": "GET /admin/customers — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Customer search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/customers?kw=An&page=0",
+            "description": "GET /admin/customers?kw=An&page=0 — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "New customer form",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/customers/new",
+            "description": "GET /admin/customers/new — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bookings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/bookings",
+            "description": "GET /admin/bookings — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pending bookings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/bookings?status=PENDING&page=0",
+            "description": "GET /admin/bookings?status=PENDING&page=0 — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revenue report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/reports",
+            "description": "GET /admin/reports — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revenue date range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/reports?startDate=2026-01-01&endDate=2026-12-31",
+            "description": "GET /admin/reports?startDate=2026-01-01&endDate=2026-12-31 — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/logout",
+            "description": "POST /logout — expected HTTP 302."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 302\", function () { pm.response.to.have.status(302); });",
+                  "pm.test(\"Redirect to /login\", function () { pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/login\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 Customer session",
+      "item": [
+        {
+          "name": "Customer login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/login",
+            "description": "POST /login — expected HTTP 302.",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{customerUsername}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{customerPassword}}",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 302\", function () { pm.response.to.have.status(302); });",
+                  "pm.test(\"Redirect to /\", function () { pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/customer/profile",
+            "description": "GET /customer/profile — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Change password form",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/customer/password",
+            "description": "GET /customer/password — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Booking history",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/customer/bookings",
+            "description": "GET /customer/bookings — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pending booking history",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/customer/bookings?status=PENDING&page=0",
+            "description": "GET /customer/bookings?status=PENDING&page=0 — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Customer logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/logout",
+            "description": "POST /logout — expected HTTP 302."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 302\", function () { pm.response.to.have.status(302); });",
+                  "pm.test(\"Redirect to /login\", function () { pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/login\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 Session cleanup",
+      "item": [
+        {
+          "name": "Protected page after logout",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/customer/profile",
+            "description": "GET /customer/profile — expected HTTP 302."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 302\", function () { pm.response.to.have.status(302); });",
+                  "pm.test(\"Redirect to /login\", function () { pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/login\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Public page after logout",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/movies",
+            "description": "GET /movies — expected HTTP 200."
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"HTML response\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
