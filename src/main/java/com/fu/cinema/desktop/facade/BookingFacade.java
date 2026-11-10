@@ -38,7 +38,15 @@ public class BookingFacade {
     }
 
     public BookingDetail detail(Long id) {
-        var booking = bookingService.getDetail(id);
+        SessionUser u = session.getUser();
+        com.fu.cinema.entity.Booking booking;
+        if (u != null && u.isCustomer()) {
+            Long customerId = customerRepository.findByAccount_AccountId(u.getAccountId())
+                    .map(Customer::getCustomerId).orElseThrow(() -> new BusinessException("Không tìm thấy khách hàng"));
+            booking = bookingService.getDetailForCustomer(id, customerId);
+        } else {
+            booking = bookingService.getDetail(id);
+        }
         var showtime = booking.getShowtime();
         return new BookingDetail(id, booking.getCustomer().getFullName(), booking.getCustomer().getMobile(),
                 showtime.getMovie().getTitle(), showtime.getRoom().getRoomName(), showtime.getStartTime(),
