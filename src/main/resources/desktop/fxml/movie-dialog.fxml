@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.fu.cinema.desktop.controller.MovieDialogController"
+      spacing="12" prefWidth="550">
+    <padding>
+        <Insets top="16" right="20" bottom="16" left="20"/>
+    </padding>
+
+    <!-- Thông báo lỗi khi validate không đạt -->
+    <Label fx:id="lblError" text="" style="-fx-text-fill: #d32f2f; -fx-font-weight: bold; -fx-padding: 4 8; -fx-background-color: #fee2e2; -fx-background-radius: 4;"
+           wrapText="true" visible="false" managed="false"/>
+
+    <GridPane hgap="12" vgap="12">
+        <columnConstraints>
+            <ColumnConstraints minWidth="120" prefWidth="130"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+
+        <!-- Tên phim -->
+        <Label text="Tên phim: *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="tfTitle" promptText="Nhập tên phim" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <!-- Thể loại -->
+        <Label text="Thể loại: *" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="cbGenre" promptText="Chọn thể loại" prefWidth="250" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <!-- Đạo diễn -->
+        <Label text="Đạo diễn: *" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="tfDirector" promptText="Nhập tên đạo diễn" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <!-- Thời lượng -->
+        <Label text="Thời lượng (phút): *" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Spinner fx:id="spDuration" prefWidth="150" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <!-- Ngày khởi chiếu -->
+        <Label text="Ngày khởi chiếu: *" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="dpReleaseDate" prefWidth="200" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <!-- Giới hạn độ tuổi -->
+        <Label text="Độ tuổi: *" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="cbAgeRating" promptText="Chọn độ tuổi" prefWidth="200" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+        <!-- Trạng thái -->
+        <Label text="Trạng thái: *" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="cbStatus" promptText="Chọn trạng thái" prefWidth="200" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+        <!-- Poster URL -->
+        <Label text="Poster URL: *" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+        <TextField fx:id="tfPosterUrl" promptText="https://... hoặc /images/..." GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+        <!-- Mô tả -->
+        <Label text="Mô tả phim: *" GridPane.rowIndex="8" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
+        <TextArea fx:id="taDescription" promptText="Nội dung tóm tắt của phim" wrapText="true" prefRowCount="4" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+    </GridPane>
+</VBox>

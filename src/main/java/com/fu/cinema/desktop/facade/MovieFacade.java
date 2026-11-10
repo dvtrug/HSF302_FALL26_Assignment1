@@ -37,4 +37,20 @@ public class MovieFacade {
     public MovieForm getForm(Long movieId) {
         return movieService.getForm(movieId);
     }
+
+    @Transactional
+    public void save(MovieForm form) {
+        session.requireAdmin();
+        if (form.getMovieId() == null) {
+            movieService.create(form);
+        } else {
+            movieService.update(form.getMovieId(), form);
+        }
+    }
+
+    @Transactional
+    public boolean delete(Long movieId) {
+        session.requireAdmin();
+        return movieService.delete(movieId);
+    }
 }
