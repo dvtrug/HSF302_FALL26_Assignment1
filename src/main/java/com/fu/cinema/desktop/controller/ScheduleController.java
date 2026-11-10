@@ -21,4 +21,7 @@ public class ScheduleController {
 
     @FXML
     private Tab tabRooms;
+
+    @FXML
+    private Tab tabShowtimes;
 }
