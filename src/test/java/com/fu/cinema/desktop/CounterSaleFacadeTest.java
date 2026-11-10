@@ -25,8 +25,8 @@ import java.util.concurrent.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
+@SpringBootTest(properties = "spring.datasource.url=jdbc:h2:mem:countersalefacade;MODE=MSSQLServer;DB_CLOSE_DELAY=-1")
+@ActiveProfiles({"test", "desktop"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class CounterSaleFacadeTest {
     @Autowired CounterSaleFacade facade;
