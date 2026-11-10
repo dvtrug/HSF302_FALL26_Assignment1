@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.fu.cinema.desktop.controller.GenreController"
+      fx:id="root" styleClass="page" spacing="16">
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Quản Lý Thể Loại Phim" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <ProgressIndicator fx:id="progress" prefWidth="24" prefHeight="24" visible="false"/>
+    </HBox>
+
+    <SplitPane VBox.vgrow="ALWAYS" dividerPositions="0.6">
+        <!-- Bên trái: Bảng danh sách thể loại (Master) -->
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <Label text="Danh sách thể loại" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnReload" text="Làm mới" onAction="#onReload"/>
+            </HBox>
+            <TableView fx:id="tableGenres" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="colName" text="Tên thể loại" prefWidth="180"/>
+                    <TableColumn fx:id="colDescription" text="Mô tả" prefWidth="300"/>
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
+        </VBox>
+
+        <!-- Bên phải: Form thông tin chi tiết (Detail) -->
+        <VBox spacing="14" styleClass="genre-form-pane">
+            <padding>
+                <Insets top="12" right="16" bottom="12" left="16"/>
+            </padding>
+            <Label fx:id="lblFormTitle" text="Thêm thể loại mới" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+
+            <VBox spacing="4">
+                <Label text="Tên thể loại: *"/>
+                <TextField fx:id="tfGenreName" promptText="Nhập tên thể loại (tối đa 50 ký tự)"/>
+            </VBox>
+
+            <VBox spacing="4" VBox.vgrow="ALWAYS">
+                <Label text="Mô tả: *"/>
+                <TextArea fx:id="taDescription" promptText="Mô tả ngắn gọn về thể loại phim" wrapText="true" VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <HBox spacing="8" alignment="CENTER_RIGHT">
+                <Button fx:id="btnClear" text="Nhập lại" onAction="#onClearForm"/>
+                <Button fx:id="btnDelete" text="Xoá" onAction="#onDeleteGenre" styleClass="button-danger"/>
+                <Button fx:id="btnSave" text="Lưu thể loại" onAction="#onSaveGenre" styleClass="button, primary"/>
+            </HBox>
+        </VBox>
+    </SplitPane>
+</VBox>
