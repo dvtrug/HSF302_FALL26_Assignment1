@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox fx:id="root" spacing="20" styleClass="page" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.fu.cinema.desktop.controller.RoomController">
+
+    <!-- Left panel: TableView for rooms -->
+    <VBox spacing="10" HBox.hgrow="ALWAYS">
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label text="Danh sách phòng chiếu" styleClass="section-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblRoomCount" styleClass="text-muted"/>
+            <Button fx:id="btnRefresh" text="Làm mới" onAction="#reload" styleClass="button"/>
+        </HBox>
+
+        <TableView fx:id="tableRooms" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colId" text="Mã" prefWidth="60"/>
+                <TableColumn fx:id="colName" text="Tên phòng" prefWidth="180"/>
+                <TableColumn fx:id="colType" text="Loại" prefWidth="100"/>
+                <TableColumn fx:id="colRows" text="Số hàng" prefWidth="90"/>
+                <TableColumn fx:id="colSeatsPerRow" text="Số ghế/hàng" prefWidth="100"/>
+                <TableColumn fx:id="colCapacity" text="Sức chứa" prefWidth="100"/>
+                <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+        </TableView>
+    </VBox>
+
+    <!-- Right panel: Room input form -->
+    <VBox fx:id="formBox" spacing="14" styleClass="kpi-card" prefWidth="360" minWidth="320">
+        <Label fx:id="lblFormTitle" text="Thêm phòng chiếu mới" styleClass="section-title"/>
+
+        <VBox spacing="4">
+            <Label text="Tên phòng chiếu (*)" styleClass="field-label"/>
+            <TextField fx:id="tfName" promptText="VD: Phòng 01, IMAX 01..."/>
+        </VBox>
+
+        <VBox spacing="4">
+            <Label text="Loại phòng (*)" styleClass="field-label"/>
+            <ComboBox fx:id="cbType" maxWidth="Infinity" promptText="Chọn loại phòng"/>
+        </VBox>
+
+        <HBox spacing="12">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Số hàng ghế (1–26)" styleClass="field-label"/>
+                <Spinner fx:id="spRows" editable="true" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Ghế / hàng (1–30)" styleClass="field-label"/>
+                <Spinner fx:id="spSeatsPerRow" editable="true" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
+
+        <VBox spacing="4">
+            <Label text="Sức chứa tạm tính:" styleClass="field-label"/>
+            <Label fx:id="lblCalculatedCapacity" text="120 ghế" styleClass="kpi-value, kpi-showing"/>
+        </VBox>
+
+        <VBox spacing="4">
+            <Label text="Trạng thái (*)" styleClass="field-label"/>
+            <ComboBox fx:id="cbStatus" maxWidth="Infinity" promptText="Chọn trạng thái"/>
+        </VBox>
+
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <!-- Form Action Buttons -->
+        <HBox spacing="8" alignment="CENTER_RIGHT">
+            <Button fx:id="btnNew" text="Làm lại" onAction="#onNew" styleClass="button"/>
+            <Button fx:id="btnDelete" text="Xoá" onAction="#onDelete" styleClass="button"/>
+            <Button fx:id="btnSave" text="Lưu phòng" onAction="#onSave" styleClass="button, primary"/>
+        </HBox>
+    </VBox>
+
+</HBox>
